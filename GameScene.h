@@ -1,16 +1,16 @@
-﻿#ifndef __HELLOWORLD_SCENE_H__
-#define __HELLOWORLD_SCENE_H__
+﻿#ifndef __GAME_SCENE_H__
+#define __GAME_SCENE_H__
 
-#include "cocos2d.h"
+#include "GameManager.h"
 
-class HelloWorld : public cocos2d::LayerColor
+class GameScene : public cocos2d::LayerColor
 {
 public:
     static cocos2d::Scene* createScene();
 
     virtual bool init();
     
-    CREATE_FUNC(HelloWorld);
+    CREATE_FUNC(GameScene);
 };
 
-#endif // __HELLOWORLD_SCENE_H__
+#endif // __GAME_SCENE_H__

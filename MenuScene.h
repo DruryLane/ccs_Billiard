@@ -1,16 +1,21 @@
-﻿#ifndef __HELLOWORLD_SCENE_H__
-#define __HELLOWORLD_SCENE_H__
+﻿#ifndef __MENU_SCENE_H__
+#define __MENU_SCENE_H__
 
-#include "cocos2d.h"
+#include "GameManager.h"
 
-class HelloWorld : public cocos2d::LayerColor
+class MenuScene : public cocos2d::LayerColor
 {
 public:
     static cocos2d::Scene* createScene();
 
     virtual bool init();
     
-    CREATE_FUNC(HelloWorld);
+    CREATE_FUNC(MenuScene);
+
+	void initMenu();
+
+	void doPopup(Ref* obj);
+	void doMsgReceived(Ref* obj);
 };
 
-#endif // __HELLOWORLD_SCENE_H__
+#endif // __MENU_SCENE_H__

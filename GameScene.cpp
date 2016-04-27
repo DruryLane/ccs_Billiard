@@ -1,7 +1,5 @@
 ﻿#include "GameScene.h"
 
-USING_NS_CC;
-
 Scene* GameScene::createScene()
 {
     auto scene = Scene::create();
