@@ -18,6 +18,7 @@ bool HelloWorld::init()
 	{
 		return false;
 	}
+	asdfsa
     
     return true;
 }
