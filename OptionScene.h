@@ -14,8 +14,7 @@ public:
 
 	void initMenu();
 
-	void doSendMsg(Object* pSender);
-	void doClose(Object* pSender);
+	void doSelectOption(Object* pSender);
 };
 
 #endif // __OPTION_SCENE_H__

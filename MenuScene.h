@@ -16,6 +16,9 @@ public:
 
 	void doPopup(Ref* obj);
 	void doMsgReceived(Ref* obj);
+
+	int option;
+	Menu* pMenu;
 };
 
 #endif // __MENU_SCENE_H__

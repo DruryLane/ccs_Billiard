@@ -11,6 +11,8 @@ public:
     virtual bool init();
     
     CREATE_FUNC(GameScene);
+
+	void doMsgReceived(Ref* obj);
 };
 
 #endif // __GAME_SCENE_H__

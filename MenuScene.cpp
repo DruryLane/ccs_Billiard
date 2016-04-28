@@ -1,5 +1,6 @@
 ﻿#include "MenuScene.h"
 #include "OptionScene.h"
+#include "GameScene.h"
 
 Scene* MenuScene::createScene()
 {
@@ -17,6 +18,7 @@ bool MenuScene::init()
 	{
 		return false;
 	}
+	option = 0;
 
 	initMenu();
     
@@ -29,32 +31,42 @@ void MenuScene::initMenu() {
 	auto pMenuItem1 = MenuItemFont::create(
 		"싱글모드", CC_CALLBACK_1(MenuScene::doPopup, this));
 	pMenuItem1->setColor(Color3B::BLACK);
+	pMenuItem1->setTag(_MODE_SINGLE_);
 
 	auto pMenuItem2 = MenuItemFont::create(
 		"2인모드", CC_CALLBACK_1(MenuScene::doPopup, this));
 	pMenuItem2->setColor(Color3B::BLACK);
+	pMenuItem2->setTag(_MODE_DOUBLE_);
 
-	auto pMenu = Menu::create(pMenuItem1, pMenuItem2, nullptr);
+	pMenu = Menu::create(pMenuItem1, pMenuItem2, nullptr);
 
 	pMenu->alignItemsVertically();
 	pMenu->setPosition(Vec2(winSize.width / 2.0f, winSize.height / 2.0f));
-	
-	this->addChild(pMenu);
 
-	NotificationCenter::getInstance()->addObserver(
-		this,
-		callfuncO_selector(MenuScene::doMsgReceived),
-		"TouchStatus",
-		nullptr);
+	NotificationCenter::getInstance()->addObserver(this,
+		callfuncO_selector(GameScene::doMsgReceived), "Game_Scene", nullptr);
+	NotificationCenter::getInstance()->addObserver(this,
+		callfuncO_selector(MenuScene::doMsgReceived), "Menu_Scene", nullptr);
+
+	this->addChild(pMenu);
 }
 
 void MenuScene::doPopup(Ref * obj) {
+	auto pMenuItem = (MenuItem*)obj;
+	option += pMenuItem->getTag();
+
 	Scene* popWin;
+	pMenu->setEnabled(false);
 	popWin = OptionScene::createScene();
 	this->addChild(popWin, 2000, 2000);
 }
 void MenuScene::doMsgReceived(Ref* obj) {
-	int option = (int)obj;
+	option += (10*(int)obj);
+	log("MenuScene[%d]  메세지 도착", option);
 
-	log("[%d]  메세지 도착", option);
+	NotificationCenter::getInstance()->postNotification("Game_Scene", (Ref*)option);
+	
+	auto pScene = GameScene::createScene();
+	Director::getInstance()->replaceScene(pScene);
+
 }
