@@ -20,6 +20,8 @@ bool GameScene::init()
 
 	winSize = Director::getInstance()->getWinSize();
 	curTurn = PLAYER1;
+	isPhysical = false;
+	turn = true;
 
 	if (createBox2dWorld()) {
 		this->schedule(schedule_selector(GameScene::tick));
@@ -41,6 +43,10 @@ void GameScene::tick(float dt) {
 
 	_world->Step(dt, velocityInterations, positionInterations);
 
+	if (isPhysical) {
+		isPhysical = false;
+	}
+
 	for (b2Body *b = _world->GetBodyList(); b; b = b->GetNext()) {
 		if (b->GetUserData() != nullptr) {
 			Sprite* spriteData = (Sprite *)b->GetUserData();
@@ -48,7 +54,15 @@ void GameScene::tick(float dt) {
 				Vec2(b->GetPosition().x * PTM_RATIO,
 					b->GetPosition().y * PTM_RATIO));
 			spriteData->setRotation(-1 * CC_RADIANS_TO_DEGREES(b->GetAngle()));
+
+			log("%f", b->GetLinearVelocity().Length());
+			if (b->GetLinearVelocity().Length()) {
+				isPhysical = true;
+			}
 		}
+	}
+	if (!isPhysical && !turn) {
+		turnStart();
 	}
 }
 
@@ -146,16 +160,19 @@ void GameScene::initCue() {
 }
 
 void GameScene::turnStart() {
-
+	turn = true;
+	pCue->setPosition(playerBall[curTurn]->getPosition().x, playerBall[curTurn]->getPosition().y);
+	pCue->setVisible(true);
 }
 
 void GameScene::turnEnd() {
 	pCuePower->setPosition(pCueBox->getContentSize().width / 2.0f, pCueBox->getContentSize().height / 2.0f);
+	pCue->setVisible(false);
 	//pCue->setRotation(0);
 	force.normalize();
 	curTurn++;
 	curTurn %= 2;
-	pCue->setPosition(playerBall[curTurn]->getPosition().x, playerBall[curTurn]->getPosition().y);
+	turn = false;
 }
 
 void GameScene::onEnter() {
@@ -180,12 +197,13 @@ void GameScene::onExit() {
 
 bool GameScene::onTouchBegan(Touch *touch, Event *event) {
 	auto touchPoint = touch->getLocation();
-
-	if (pCueBox->getBoundingBox().containsPoint(touchPoint)) {
-		bSelect = false;
-	}
-	else {
-		bSelect = true;
+	if (turn) {
+		if (pCueBox->getBoundingBox().containsPoint(touchPoint)) {
+			bSelect = false;
+		}
+		else {
+			bSelect = true;
+		}
 	}
 
 	return true;
@@ -195,39 +213,43 @@ void GameScene::onTouchMoved(Touch *touch, Event *event) {
 	Vec2 oldPoint = touch->getPreviousLocation();
 	Vec2 newPoint = touch->getLocation();
 
-	if (bSelect) {
-		Vec2 firstVector = oldPoint - pCue->getPosition();
-		float firstRotateAngle = -firstVector.getAngle();
-		float previousTouch = CC_RADIANS_TO_DEGREES(firstRotateAngle);
+	if (turn) {
+		if (bSelect) {
+			Vec2 firstVector = oldPoint - pCue->getPosition();
+			float firstRotateAngle = -firstVector.getAngle();
+			float previousTouch = CC_RADIANS_TO_DEGREES(firstRotateAngle);
 
-		Vec2 secondVector = newPoint - pCue->getPosition();
-		float secondRotateAngle = -secondVector.getAngle();
-		float currentTouch = CC_RADIANS_TO_DEGREES(secondRotateAngle);
+			Vec2 secondVector = newPoint - pCue->getPosition();
+			float secondRotateAngle = -secondVector.getAngle();
+			float currentTouch = CC_RADIANS_TO_DEGREES(secondRotateAngle);
 
-		force = force.rotateByAngle(Vec2::ZERO, firstRotateAngle - secondRotateAngle);
-		gRotation += currentTouch - previousTouch;
-		gRotation = fmod(gRotation, 360.0f);
-		pCue->setRotation(gRotation);
-	}
-	else {
-		power += (oldPoint.y - newPoint.y);
-		if (power > pCueBox->getContentSize().height)
-			power = pCueBox->getContentSize().height;
-		if (power < 0)
-			power = 0;
-		pCuePower->setPositionY(pCueBox->getContentSize().height / 2.0f - power);
+			force = force.rotateByAngle(Vec2::ZERO, firstRotateAngle - secondRotateAngle);
+			gRotation += currentTouch - previousTouch;
+			gRotation = fmod(gRotation, 360.0f);
+			pCue->setRotation(gRotation);
+		}
+		else {
+			power += (oldPoint.y - newPoint.y);
+			if (power > pCueBox->getContentSize().height)
+				power = pCueBox->getContentSize().height;
+			if (power < 0)
+				power = 0;
+			pCuePower->setPositionY(pCueBox->getContentSize().height / 2.0f - power);
+		}
 	}
 }
 
 void GameScene::onTouchEnded(Touch *touch, Event *event) {
-	if (bSelect) {
-		bSelect = false;
-		log("%f %f", force.x, force.y);
-	}
-	else {
-		force *= (power * POWER);
-		b2Vec2 bForce = b2Vec2(force.x / PTM_RATIO, force.y / PTM_RATIO);
-		playerBall[curTurn]->getBody()->ApplyForceToCenter(bForce, true);
-		turnEnd();
+	if (turn) {
+		if (bSelect) {
+			bSelect = false;
+			log("%f %f", force.x, force.y);
+		}
+		else {
+			force *= (power * POWER);
+			b2Vec2 bForce = b2Vec2(force.x / PTM_RATIO, force.y / PTM_RATIO);
+			playerBall[curTurn]->getBody()->ApplyForceToCenter(bForce, true);
+			turnEnd();
+		}
 	}
 }

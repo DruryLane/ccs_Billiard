@@ -43,6 +43,8 @@ public:
 	Sprite* pCueBox;
 	Sprite* pCuePower;
 	Vec2 force;
+	bool isPhysical;
+	bool turn;
 
 	int curTurn;
 	float power;
