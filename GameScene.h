@@ -3,6 +3,7 @@
 
 #include "GameManager.h"
 #include "Box2D/Box2D.h"
+#include "BilliardBall.h"
 
 class GameScene : public cocos2d::LayerColor
 {
@@ -15,12 +16,13 @@ public:
 
 	void doMsgReceived(Ref* obj);
 	void tick(float dt);
-	bool createBox2dWorld(bool debug);
+	bool createBox2dWorld();
+		void initBox2dWorld(b2Vec2 g);
+		void initBall();
 	void initBackGround();
+	void initCue();
+	
 	~GameScene();
-	b2Body* getBodyAtTab(Vec2 p);
-	b2Body* addNewSprite(Vec2 point, Color3B color);
-	b2Body* addNewSprite(Vec2 point);
 
 	virtual void onEnter();
 	virtual void onExit();
@@ -31,10 +33,18 @@ public:
 	Size winSize;
 	b2World* _world;
 
-	b2Vec2 startPoint;
-	b2Vec2 endPoint;
-	b2Body* myBall;
-	bool bBallTouch;
+	BilliardBall* playerBall1;
+	BilliardBall* playerBall2;
+	BilliardBall* otherBall1;
+	BilliardBall* otherBall2;
+	Sprite* pCue;
+	Sprite* pCueBox;
+	Sprite* pCuePower;
+	Vec2 force;
+
+	float power;
+	float gRotation;
+	bool bSelect;
 };
 
 #endif // __GAME_SCENE_H__
