@@ -1,24 +1,44 @@
 #include "ContactListener.h"
 
-ContactListener::ContactListener()
-{}
-ContactListener::~ContactListener()
-{}
+ContactListener::ContactListener(){
+	for (int i = 0; i < 4; i++) {
+		contactBall[i] = false;
+	}
+}
+ContactListener::~ContactListener(){
 
-void ContactListener::BeginContact(b2Contact* contact)
-{
-	log("Contact : Begin");
 }
-void ContactListener::EndContact(b2Contact* contact)
-{
-	log("Contact : End");
+
+bool ContactListener::isScore() {
+	log("µé¾î¿ÈisScore");
+	bool b;
+	if (!contactBall[PLAYER1] && !contactBall[PLAYER2] && contactBall[OTHER1] && contactBall[OTHER2]) {
+		b = true;
+	}
+	else {
+		b = false;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		contactBall[i] = false;
+	}
+
+	return b;
 }
-void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
-{
-	log("Contact : PreSolve");
+
+void ContactListener::BeginContact(b2Contact* contact){
+
 }
-void ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
-{
+
+void ContactListener::EndContact(b2Contact* contact){
+
+}
+
+void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold){
+
+}
+
+void ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse){
 	log("Contact : PostSolve ... 1");
 
 	b2Fixture* fixA = contact->GetFixtureA();
@@ -27,8 +47,14 @@ void ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impu
 	b2Body* bodyA = fixA->GetBody();
 	b2Body* bodyB = fixB->GetBody();
 	
-	if (bodyA->GetType() == b2_dynamicBody || bodyB->GetType() == b2_dynamicBody)
-	{
-		log("Contact : impulse ... %f %f", impulse->normalImpulses[0], impulse->tangentImpulses[0]);
+	if (bodyA->GetType() == b2_dynamicBody && bodyB->GetType() == b2_dynamicBody){
+		BilliardBall* ballA = (BilliardBall*)bodyA->GetUserData();
+		BilliardBall* ballB = (BilliardBall*)bodyB->GetUserData();
+		if (ballA->isTarget()) {
+			contactBall[ballB->getBallNum()] = true;
+		}
+		else if (ballB->isTarget()) {
+			contactBall[ballA->getBallNum()] = true;
+		}
 	}
 }

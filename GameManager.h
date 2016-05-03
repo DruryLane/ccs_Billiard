@@ -5,6 +5,8 @@
 #define POWER		100
 #define PLAYER1		0
 #define PLAYER2		1
+#define OTHER1		2
+#define OTHER2		3
 
 #define GROUND_X1	56.380878f
 #define GROUND_X2	432.762817f

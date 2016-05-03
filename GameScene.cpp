@@ -56,7 +56,6 @@ void GameScene::tick(float dt) {
 					b->GetPosition().y * PTM_RATIO));
 			spriteData->setRotation(-1 * CC_RADIANS_TO_DEGREES(b->GetAngle()));
 
-			log("%f", b->GetLinearVelocity().Length());
 			if (b->GetLinearVelocity().Length()) {
 				isPhysical = true;
 			}
@@ -110,17 +109,18 @@ void GameScene::initBox2dWorld(b2Vec2 g) {
 }
 
 void GameScene::initBall() {
-	playerBall[PLAYER1] = new BilliardBall(Color3B::RED);
-	playerBall[PLAYER1]->setBody(createBall(Vec2(150, 150), playerBall[PLAYER1]));
+	playerBall[PLAYER1] = new BilliardBall(Color3B::RED, PLAYER1);
+	playerBall[PLAYER1]->setBody(createBall(Vec2(230, 450), playerBall[PLAYER1]));
+	playerBall[PLAYER1]->setTarget(true);
 
-	playerBall[PLAYER2] = new BilliardBall(Color3B::YELLOW);
-	playerBall[PLAYER2]->setBody(createBall(Vec2(100, 100), playerBall[PLAYER2]));
+	playerBall[PLAYER2] = new BilliardBall(Color3B::YELLOW, PLAYER2);
+	playerBall[PLAYER2]->setBody(createBall(Vec2(230, 400), playerBall[PLAYER2]));
 
-	otherBall1 = new BilliardBall(Color3B::WHITE);
-	otherBall1->setBody(createBall(Vec2(250, 250), otherBall1));
+	otherBall1 = new BilliardBall(Color3B::WHITE, OTHER1);
+	otherBall1->setBody(createBall(Vec2(210, 550), otherBall1));
 
-	otherBall2 = new BilliardBall(Color3B::WHITE);
-	otherBall2->setBody(createBall(Vec2(250, 350), otherBall2));
+	otherBall2 = new BilliardBall(Color3B::WHITE, OTHER2);
+	otherBall2->setBody(createBall(Vec2(250, 550), otherBall2));
 }
 
 b2Body* GameScene::createBall(Vec2 position, BilliardBall* pBilliardBall) {
@@ -195,6 +195,20 @@ void GameScene::initCue() {
 
 void GameScene::turnStart() {
 	turn = true;
+
+	playerBall[curTurn]->setTarget(false);
+
+	if (myContactLstener->isScore()) {
+		log("들어옴");
+		//점수 증가//
+	}
+	else {
+		curTurn++;
+		curTurn %= 2;
+	}
+
+	playerBall[curTurn]->setTarget(true);
+
 	pCue->setPosition(playerBall[curTurn]->getPosition().x, playerBall[curTurn]->getPosition().y);
 	pCue->setVisible(true);
 }
@@ -203,10 +217,7 @@ void GameScene::turnEnd() {
 	power = 0;
 	pCuePower->setPosition(pCueBox->getContentSize().width / 2.0f, pCueBox->getContentSize().height / 2.0f);
 	pCue->setVisible(false);
-	//pCue->setRotation(0);
 	force.normalize();
-	curTurn++;
-	curTurn %= 2;
 	turn = false;
 }
 

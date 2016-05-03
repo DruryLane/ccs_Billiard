@@ -20,7 +20,7 @@ public:
 	bool createBox2dWorld();
 		void initBox2dWorld(b2Vec2 g);
 		void initBall();
-			b2Body* createBall(Vec2 position, BilliardBall* pBilliardBall);
+		b2Body* createBall(Vec2 position, BilliardBall* pBilliardBall);
 	void initBackGround();
 	void initCue();
 
