@@ -22,6 +22,8 @@ bool GameScene::init()
 	curTurn = PLAYER1;
 	isPhysical = false;
 	turn = true;
+	score[0] = 0;
+	score[1] = 1;
 
 	if (createBox2dWorld()) {
 		this->schedule(schedule_selector(GameScene::tick));
@@ -141,9 +143,9 @@ b2Body* GameScene::createBall(Vec2 position, BilliardBall* pBilliardBall) {
 
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &circle;
-	fixtureDef.density = 2.0f;
+	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.0f;
-	fixtureDef.restitution = 0.96f;
+	fixtureDef.restitution = 0.97f;
 
 	ballBody->CreateFixture(&fixtureDef);
 	return ballBody;
@@ -177,6 +179,32 @@ void GameScene::initBackGround() {
 	pCueBox->setPosition(winSize.width - 10, winSize.height / 2.0f);
 	pCueBox->setScale(0.4);
 	this->addChild(pCueBox, Z_ORDER_BACKGROND);
+
+	auto pUserLabel = LabelTTF::create("P1 Score : ", "Arial", 30);
+	pUserLabel->setAnchorPoint(Vec2(0, 1));
+	pUserLabel->setPosition(Vec2(50, winSize.height - 30));
+	pUserLabel->setColor(Color3B::BLUE);
+	this->addChild(pUserLabel, Z_ORDER_BACKGROND);
+
+	auto pComLabel = LabelTTF::create("P2 Score : ", "Arial", 30);
+	pComLabel->setAnchorPoint(Vec2(0, 1));
+	pComLabel->setPosition(Vec2(winSize.width / 2 + 20, winSize.height - 30));
+	pComLabel->setColor(Color3B::BLUE);
+	this->addChild(pComLabel, Z_ORDER_BACKGROND);
+
+	auto pUserScoreLabel = LabelTTF::create("0", "Arial", 30);
+	pUserScoreLabel->setAnchorPoint(Vec2(0, 1));
+	pUserScoreLabel->setPosition(Vec2(50 + pUserLabel->getContentSize().width, winSize.height - 30));
+	pUserScoreLabel->setColor(Color3B::BLUE);
+	pUserScoreLabel->setTag(TAG_LABEL_P1SCORE);
+	this->addChild(pUserScoreLabel, Z_ORDER_BACKGROND);
+
+	auto pComScoreLabel = LabelTTF::create("0", "Arial", 30);
+	pComScoreLabel->setAnchorPoint(Vec2(0, 1));
+	pComScoreLabel->setPosition(Vec2(winSize.width / 2 + 20 + pComLabel->getContentSize().width, winSize.height - 30));
+	pComScoreLabel->setColor(Color3B::BLUE);
+	pComScoreLabel->setTag(TAG_LABEL_P2SCORE);
+	this->addChild(pComScoreLabel, Z_ORDER_BACKGROND);
 }
 
 void GameScene::initCue() {
@@ -199,8 +227,11 @@ void GameScene::turnStart() {
 	playerBall[curTurn]->setTarget(false);
 
 	if (myContactLstener->isScore()) {
-		log("들어옴");
-		//점수 증가//
+		//점수 증가
+		score[curTurn] += 10;
+
+		//점수 출력
+
 	}
 	else {
 		curTurn++;
@@ -289,7 +320,6 @@ void GameScene::onTouchEnded(Touch *touch, Event *event) {
 	if (turn) {
 		if (bSelect) {
 			bSelect = false;
-			log("%f %f", force.x, force.y);
 		}
 		else {
 			force *= (power * POWER);

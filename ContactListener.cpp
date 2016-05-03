@@ -10,7 +10,6 @@ ContactListener::~ContactListener(){
 }
 
 bool ContactListener::isScore() {
-	log("µé¾î¿ÈisScore");
 	bool b;
 	if (!contactBall[PLAYER1] && !contactBall[PLAYER2] && contactBall[OTHER1] && contactBall[OTHER2]) {
 		b = true;
@@ -39,8 +38,6 @@ void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold
 }
 
 void ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse){
-	log("Contact : PostSolve ... 1");
-
 	b2Fixture* fixA = contact->GetFixtureA();
 	b2Fixture* fixB = contact->GetFixtureB();
 

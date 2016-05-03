@@ -23,6 +23,7 @@ public:
 		b2Body* createBall(Vec2 position, BilliardBall* pBilliardBall);
 	void initBackGround();
 	void initCue();
+	void printScore();
 
 	void turnStart();
 	void turnEnd();
@@ -53,6 +54,7 @@ public:
 	float power;
 	float gRotation;
 	bool bSelect;
+	int score[2];
 };
 
 #endif // __GAME_SCENE_H__

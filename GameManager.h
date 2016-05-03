@@ -22,6 +22,9 @@
 #define Z_ORDER_BALL		2
 #define Z_ORDER_CUE			3
 
+#define TAG_LABEL_P1SCORE	0
+#define TAG_LABEL_P2SCORE	1
+
 #include "cocos2d.h"
 
 USING_NS_CC;
