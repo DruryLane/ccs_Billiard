@@ -106,15 +106,15 @@ void GameScene::initBox2dWorld(b2Vec2 g) {
 }
 
 void GameScene::initBall() {
-	playerBall[PLAYER1] = new BilliardBall(Vec2(150, 150), Color3B::RED, this, _world);
-	playerBall[PLAYER2] = new BilliardBall(Vec2(100, 100), Color3B::YELLOW, this, _world);
-	otherBall1 = new BilliardBall(Vec2(250, 250), Color3B::WHITE, this, _world);
-	otherBall2 = new BilliardBall(Vec2(250, 350), Color3B::WHITE, this, _world);
+	playerBall[PLAYER1] = new BilliardBall(Color3B::RED, this, _world);
+	playerBall[PLAYER2] = new BilliardBall(Color3B::YELLOW, this, _world);
+	otherBall1 = new BilliardBall(Color3B::WHITE, this, _world);
+	otherBall2 = new BilliardBall(Color3B::WHITE, this, _world);
 
-	playerBall[PLAYER1]->CreateBody();
-	playerBall[PLAYER2]->CreateBody();
-	otherBall1->CreateBody();
-	otherBall2->CreateBody();
+	playerBall[PLAYER1]->CreateBody(Vec2(150, 150));
+	playerBall[PLAYER2]->CreateBody(Vec2(100, 100));
+	otherBall1->CreateBody(Vec2(250, 250));
+	otherBall2->CreateBody(Vec2(250, 350));
 }
 
 GameScene::~GameScene() {

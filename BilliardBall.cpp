@@ -1,14 +1,13 @@
 ﻿#include "BilliardBall.h"
 
-BilliardBall::BilliardBall(Vec2 _position, Color3B _color, Layer *_layer, b2World *_world)
+BilliardBall::BilliardBall(Color3B _color, Layer *_layer, b2World *_world)
 {
-	position = _position;
 	color = _color;
 	layer = _layer;
 	world = _world;
 }
 
-void BilliardBall::CreateBody() {
+void BilliardBall::CreateBody(Vec2 position) {
 	Sprite* pSprite = Sprite::create("ball.png");
 	pSprite->setPosition(position.x, position.y);
 	pSprite->setScale(2.2);
