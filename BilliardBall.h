@@ -8,16 +8,17 @@ USING_NS_CC;
 
 class BilliardBall {
 public:
-	BilliardBall(Color3B _color, Layer *_layer, b2World *_world);
-	void CreateBody(Vec2 position);
-	Vec2 getPosition();
+	BilliardBall(Color3B color);
+	
+	Sprite* getSprite();
 	b2Body* getBody();
-
+	Vec2 getPosition();
+	
+	void setSprite(Sprite* sprite);
+	void setBody(b2Body* body);
 private:
-	Color3B color;
-	b2Body* ballBody;
-	Layer* layer;
-	b2World* world;
+	Sprite* pSprite;
+	b2Body* pBody;
 };
 
 #endif // __BILLIARD_BALL_H__

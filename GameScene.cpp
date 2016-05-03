@@ -49,7 +49,8 @@ void GameScene::tick(float dt) {
 
 	for (b2Body *b = _world->GetBodyList(); b; b = b->GetNext()) {
 		if (b->GetUserData() != nullptr) {
-			Sprite* spriteData = (Sprite *)b->GetUserData();
+			BilliardBall* billiardBall = (BilliardBall*)b->GetUserData();
+			Sprite* spriteData = billiardBall->getSprite();
 			spriteData->setPosition(
 				Vec2(b->GetPosition().x * PTM_RATIO,
 					b->GetPosition().y * PTM_RATIO));
@@ -103,18 +104,49 @@ void GameScene::initBox2dWorld(b2Vec2 g) {
 	groundEdge.Set(b2Vec2(GROUND_X1 / PTM_RATIO, GROUND_Y2 / PTM_RATIO), b2Vec2(GROUND_X2 / PTM_RATIO, GROUND_Y2 / PTM_RATIO));
 	groundBody->CreateFixture(&boxShapeDef);
 
+	myContactLstener = new ContactListener();
+	_world->SetContactListener((b2ContactListener*)myContactLstener);
+
 }
 
 void GameScene::initBall() {
-	playerBall[PLAYER1] = new BilliardBall(Color3B::RED, this, _world);
-	playerBall[PLAYER2] = new BilliardBall(Color3B::YELLOW, this, _world);
-	otherBall1 = new BilliardBall(Color3B::WHITE, this, _world);
-	otherBall2 = new BilliardBall(Color3B::WHITE, this, _world);
+	playerBall[PLAYER1] = new BilliardBall(Color3B::RED);
+	playerBall[PLAYER1]->setBody(createBall(Vec2(150, 150), playerBall[PLAYER1]));
 
-	playerBall[PLAYER1]->CreateBody(Vec2(150, 150));
-	playerBall[PLAYER2]->CreateBody(Vec2(100, 100));
-	otherBall1->CreateBody(Vec2(250, 250));
-	otherBall2->CreateBody(Vec2(250, 350));
+	playerBall[PLAYER2] = new BilliardBall(Color3B::YELLOW);
+	playerBall[PLAYER2]->setBody(createBall(Vec2(100, 100), playerBall[PLAYER2]));
+
+	otherBall1 = new BilliardBall(Color3B::WHITE);
+	otherBall1->setBody(createBall(Vec2(250, 250), otherBall1));
+
+	otherBall2 = new BilliardBall(Color3B::WHITE);
+	otherBall2->setBody(createBall(Vec2(250, 350), otherBall2));
+}
+
+b2Body* GameScene::createBall(Vec2 position, BilliardBall* pBilliardBall) {
+	Sprite* pSprite = pBilliardBall->getSprite();
+	pSprite->setPosition(position.x, position.y);
+	this->addChild(pSprite, Z_ORDER_BALL);
+
+	b2BodyDef bodyDef;
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.position.Set(position.x / PTM_RATIO, position.y / PTM_RATIO);
+	bodyDef.userData = pBilliardBall;
+
+	b2Body* ballBody = _world->CreateBody(&bodyDef);
+	ballBody->SetLinearDamping(0.5f);
+	//원모양
+	b2CircleShape circle;
+	circle.m_radius = (pSprite->getScale()* 8.0f) / PTM_RATIO;
+
+	b2FixtureDef fixtureDef;
+	fixtureDef.shape = &circle;
+	fixtureDef.density = 2.0f;
+	fixtureDef.friction = 0.0f;
+	fixtureDef.restitution = 0.96f;
+
+	ballBody->CreateFixture(&fixtureDef);
+	return ballBody;
 }
 
 GameScene::~GameScene() {
@@ -123,12 +155,14 @@ GameScene::~GameScene() {
 	delete playerBall[PLAYER2];
 	delete otherBall1;
 	delete otherBall2;
+	delete myContactLstener;
 
 	_world = nullptr;
 	playerBall[PLAYER1] = nullptr;
 	playerBall[PLAYER2] = nullptr;
 	otherBall1 = nullptr;
 	otherBall2 = nullptr;
+	myContactLstener = nullptr;
 }
 
 void GameScene::initBackGround() {
@@ -166,6 +200,7 @@ void GameScene::turnStart() {
 }
 
 void GameScene::turnEnd() {
+	power = 0;
 	pCuePower->setPosition(pCueBox->getContentSize().width / 2.0f, pCueBox->getContentSize().height / 2.0f);
 	pCue->setVisible(false);
 	//pCue->setRotation(0);
