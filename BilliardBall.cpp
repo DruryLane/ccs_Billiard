@@ -36,7 +36,7 @@ void BilliardBall::CreateBody() {
 }
 
 Vec2 BilliardBall::getPosition() {
-	return position;
+	return Vec2(ballBody->GetPosition().x * PTM_RATIO, ballBody->GetPosition().y * PTM_RATIO);
 }
 
 b2Body* BilliardBall::getBody() {

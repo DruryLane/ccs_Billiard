@@ -21,6 +21,9 @@ public:
 		void initBall();
 	void initBackGround();
 	void initCue();
+
+	void turnStart();
+	void turnEnd();
 	
 	~GameScene();
 
@@ -33,8 +36,7 @@ public:
 	Size winSize;
 	b2World* _world;
 
-	BilliardBall* playerBall1;
-	BilliardBall* playerBall2;
+	BilliardBall* playerBall[2];
 	BilliardBall* otherBall1;
 	BilliardBall* otherBall2;
 	Sprite* pCue;
@@ -42,6 +44,7 @@ public:
 	Sprite* pCuePower;
 	Vec2 force;
 
+	int curTurn;
 	float power;
 	float gRotation;
 	bool bSelect;

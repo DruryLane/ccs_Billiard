@@ -1,8 +1,10 @@
 #ifndef __GAME_MANAGER_H__
 #define __GAME_MANAGER_H__
 
-#define PTM_RATIO 32
-#define POWER	100
+#define PTM_RATIO	32
+#define POWER		100
+#define PLAYER1		0
+#define PLAYER2		1
 
 #define GROUND_X1	56.380878f
 #define GROUND_X2	432.762817f

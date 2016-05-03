@@ -19,6 +19,7 @@ bool GameScene::init()
 	}
 
 	winSize = Director::getInstance()->getWinSize();
+	curTurn = PLAYER1;
 
 	if (createBox2dWorld()) {
 		this->schedule(schedule_selector(GameScene::tick));
@@ -91,27 +92,27 @@ void GameScene::initBox2dWorld(b2Vec2 g) {
 }
 
 void GameScene::initBall() {
-	playerBall1 = new BilliardBall(Vec2(150, 150), Color3B::RED, this, _world);
-	playerBall2 = new BilliardBall(Vec2(100, 100), Color3B::YELLOW, this, _world);
+	playerBall[PLAYER1] = new BilliardBall(Vec2(150, 150), Color3B::RED, this, _world);
+	playerBall[PLAYER2] = new BilliardBall(Vec2(100, 100), Color3B::YELLOW, this, _world);
 	otherBall1 = new BilliardBall(Vec2(250, 250), Color3B::WHITE, this, _world);
 	otherBall2 = new BilliardBall(Vec2(250, 350), Color3B::WHITE, this, _world);
 
-	playerBall1->CreateBody();
-	playerBall2->CreateBody();
+	playerBall[PLAYER1]->CreateBody();
+	playerBall[PLAYER2]->CreateBody();
 	otherBall1->CreateBody();
 	otherBall2->CreateBody();
 }
 
 GameScene::~GameScene() {
 	delete _world;
-	delete playerBall1;
-	delete playerBall2;
+	delete playerBall[PLAYER1];
+	delete playerBall[PLAYER2];
 	delete otherBall1;
 	delete otherBall2;
 
 	_world = nullptr;
-	playerBall1 = nullptr;
-	playerBall2 = nullptr;
+	playerBall[PLAYER1] = nullptr;
+	playerBall[PLAYER2] = nullptr;
 	otherBall1 = nullptr;
 	otherBall2 = nullptr;
 }
@@ -133,7 +134,7 @@ void GameScene::initBackGround() {
 void GameScene::initCue() {
 	pCue = Sprite::create("Cue.png");
 	pCue->setAnchorPoint(Vec2(0.5, 1.2));
-	pCue->setPosition(playerBall1->getPosition().x, playerBall1->getPosition().y);
+	pCue->setPosition(playerBall[curTurn]->getPosition().x, playerBall[curTurn]->getPosition().y);
 	pCue->setScale(0.4);
 	this->addChild(pCue, Z_ORDER_CUE);
 
@@ -142,6 +143,19 @@ void GameScene::initCue() {
 	pCueBox->addChild(pCuePower, Z_ORDER_CUE);
 
 	force = Vec2(0, 1);
+}
+
+void GameScene::turnStart() {
+
+}
+
+void GameScene::turnEnd() {
+	pCuePower->setPosition(pCueBox->getContentSize().width / 2.0f, pCueBox->getContentSize().height / 2.0f);
+	//pCue->setRotation(0);
+	force.normalize();
+	curTurn++;
+	curTurn %= 2;
+	pCue->setPosition(playerBall[curTurn]->getPosition().x, playerBall[curTurn]->getPosition().y);
 }
 
 void GameScene::onEnter() {
@@ -207,14 +221,13 @@ void GameScene::onTouchMoved(Touch *touch, Event *event) {
 
 void GameScene::onTouchEnded(Touch *touch, Event *event) {
 	if (bSelect) {
-		log("%f %f", force.x, force.y);
 		bSelect = false;
+		log("%f %f", force.x, force.y);
 	}
 	else {
-		//log("%f %f", force.x, force.y);
 		force *= (power * POWER);
 		b2Vec2 bForce = b2Vec2(force.x / PTM_RATIO, force.y / PTM_RATIO);
-		playerBall1->getBody()->ApplyForceToCenter(bForce, true);
-		pCuePower->setPosition(pCueBox->getContentSize().width / 2.0f, pCueBox->getContentSize().height / 2.0f);
+		playerBall[curTurn]->getBody()->ApplyForceToCenter(bForce, true);
+		turnEnd();
 	}
 }
