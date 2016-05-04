@@ -25,6 +25,8 @@ public:
 	void initBackGround();
 	void initCue();
 	void printScore(int player);
+	void setTarget(Ref* sender);
+	void moveTagetBall(Vec2 oldPoint, Vec2 newPoint);
 
 	void turnStart();
 	void turnEnd();
@@ -47,14 +49,18 @@ public:
 	Sprite* pCue;
 	Sprite* pCueBox;
 	Sprite* pCuePower;
+	Sprite* pArrow;
+	Sprite* pTarget;
 	Vec2 force;
 	bool isPhysical;
-	bool turn;
+	bool bTurn;
+	bool bSelect;
+	bool bTarget;
 
 	int curTurn;
 	float power;
 	float gRotation;
-	bool bSelect;
+	
 	int score[2];
 };
 

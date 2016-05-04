@@ -3,6 +3,9 @@
 
 #define PTM_RATIO	32
 #define POWER		100
+#define CIRCLE_SCALE	2.2
+#define CIRCLE_RADIUS	CIRCLE_SCALE * 8.0
+
 #define PLAYER1		0
 #define PLAYER2		1
 #define OTHER1		2
@@ -21,9 +24,11 @@
 #define Z_ORDER_BACKGROND	1
 #define Z_ORDER_BALL		2
 #define Z_ORDER_CUE			3
+#define Z_ORDER_TARGET		4
 
 #define TAG_LABEL_P1SCORE	0
 #define TAG_LABEL_P2SCORE	1
+#define TAG_SPRITE_TARGET_BALL	2
 
 #include "cocos2d.h"
 

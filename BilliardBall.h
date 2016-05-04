@@ -20,11 +20,13 @@ public:
 	void setBody(b2Body* body);
 	void setTarget(bool t);
 	void setBallNum(int num);
+
 private:
 	Sprite* pSprite;
 	b2Body* pBody;
 	bool target;
 	int ballNum;
+	float32 mass;
 };
 
 #endif // __BILLIARD_BALL_H__

@@ -6,7 +6,7 @@ BilliardBall::BilliardBall(Color3B color, int num)
 	ballNum = num;
 
 	pSprite = Sprite::create("ball.png");
-	pSprite->setScale(2.2);
+	pSprite->setScale(CIRCLE_SCALE);
 	pSprite->setColor(color);
 }
 
@@ -36,6 +36,7 @@ void BilliardBall::setSprite(Sprite* sprite) {
 
 void BilliardBall::setBody(b2Body* body) {
 	pBody = body;
+	mass = pBody->GetMass();
 }
 
 void BilliardBall::setTarget(bool t) {

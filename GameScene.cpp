@@ -12,8 +12,7 @@ Scene* GameScene::createScene()
 
 bool GameScene::init()
 {
-
-	if (!LayerColor::initWithColor(Color4B(255, 255, 255, 255)))
+	if (!LayerColor::initWithColor(Color4B::GRAY))
 	{
 		return false;
 	}
@@ -21,7 +20,8 @@ bool GameScene::init()
 	winSize = Director::getInstance()->getWinSize();
 	curTurn = PLAYER1;
 	isPhysical = false;
-	turn = true;
+	bTurn = true;
+	bTarget = false;
 	score[0] = 0;
 	score[1] = 0;
 
@@ -63,7 +63,7 @@ void GameScene::tick(float dt) {
 			}
 		}
 	}
-	if (!isPhysical && !turn) {
+	if (!isPhysical && !bTurn) {
 		turnStart();
 	}
 }
@@ -116,7 +116,7 @@ void GameScene::initBall() {
 	playerBall[PLAYER1]->setTarget(true);
 
 	playerBall[PLAYER2] = new BilliardBall(Color3B::YELLOW, PLAYER2);
-	playerBall[PLAYER2]->setBody(createBall(Vec2(230, 400), playerBall[PLAYER2]));
+	playerBall[PLAYER2]->setBody(createBall(Vec2(130, 200), playerBall[PLAYER2]));
 
 	otherBall1 = new BilliardBall(Color3B::WHITE, OTHER1);
 	otherBall1->setBody(createBall(Vec2(210, 550), otherBall1));
@@ -139,13 +139,13 @@ b2Body* GameScene::createBall(Vec2 position, BilliardBall* pBilliardBall) {
 	ballBody->SetLinearDamping(0.5f);
 	//원모양
 	b2CircleShape circle;
-	circle.m_radius = (pSprite->getScale()* 8.0f) / PTM_RATIO;
+	circle.m_radius = CIRCLE_RADIUS / PTM_RATIO;
 
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &circle;
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.0f;
-	fixtureDef.restitution = 0.97f;
+	fixtureDef.restitution = 0.96f;
 
 	ballBody->CreateFixture(&fixtureDef);
 	return ballBody;
@@ -180,31 +180,53 @@ void GameScene::initBackGround() {
 	pCueBox->setScale(0.4);
 	this->addChild(pCueBox, Z_ORDER_BACKGROND);
 
-	auto pUserLabel = LabelTTF::create("P1 Score : ", "Arial", 30);
-	pUserLabel->setAnchorPoint(Vec2(0, 1));
-	pUserLabel->setPosition(Vec2(50, winSize.height - 30));
-	pUserLabel->setColor(Color3B::BLUE);
-	this->addChild(pUserLabel, Z_ORDER_BACKGROND);
+	auto pP1Label = LabelTTF::create("Player1 : ", "Arial", 30);
+	pP1Label->setAnchorPoint(Vec2(0, 1));
+	pP1Label->setPosition(Vec2(50, winSize.height - 30));
+	pP1Label->setColor(Color3B::RED);
+	this->addChild(pP1Label, Z_ORDER_BACKGROND);
 
-	auto pComLabel = LabelTTF::create("P2 Score : ", "Arial", 30);
-	pComLabel->setAnchorPoint(Vec2(0, 1));
-	pComLabel->setPosition(Vec2(winSize.width / 2 + 20, winSize.height - 30));
-	pComLabel->setColor(Color3B::BLUE);
-	this->addChild(pComLabel, Z_ORDER_BACKGROND);
+	auto pP2Label = LabelTTF::create("Player2 : ", "Arial", 30);
+	pP2Label->setAnchorPoint(Vec2(0, 1));
+	pP2Label->setPosition(Vec2(winSize.width / 2 + 20, winSize.height - 30));
+	pP2Label->setColor(Color3B::YELLOW);
+	this->addChild(pP2Label, Z_ORDER_BACKGROND);
 
-	auto pUserScoreLabel = LabelTTF::create("0", "Arial", 30);
-	pUserScoreLabel->setAnchorPoint(Vec2(0, 1));
-	pUserScoreLabel->setPosition(Vec2(50 + pUserLabel->getContentSize().width, winSize.height - 30));
-	pUserScoreLabel->setColor(Color3B::BLUE);
-	pUserScoreLabel->setTag(TAG_LABEL_P1SCORE);
-	this->addChild(pUserScoreLabel, Z_ORDER_BACKGROND);
+	auto pP1ScoreLabel = LabelTTF::create("0", "Arial", 30);
+	pP1ScoreLabel->setAnchorPoint(Vec2(0, 1));
+	pP1ScoreLabel->setPosition(Vec2(50 + pP1Label->getContentSize().width, winSize.height - 30));
+	pP1ScoreLabel->setColor(Color3B::RED);
+	pP1ScoreLabel->setTag(TAG_LABEL_P1SCORE);
+	this->addChild(pP1ScoreLabel, Z_ORDER_BACKGROND);
 
-	auto pComScoreLabel = LabelTTF::create("0", "Arial", 30);
-	pComScoreLabel->setAnchorPoint(Vec2(0, 1));
-	pComScoreLabel->setPosition(Vec2(winSize.width / 2 + 20 + pComLabel->getContentSize().width, winSize.height - 30));
-	pComScoreLabel->setColor(Color3B::BLUE);
-	pComScoreLabel->setTag(TAG_LABEL_P2SCORE);
-	this->addChild(pComScoreLabel, Z_ORDER_BACKGROND);
+	auto pP2ScoreLabel = LabelTTF::create("0", "Arial", 30);
+	pP2ScoreLabel->setAnchorPoint(Vec2(0, 1));
+	pP2ScoreLabel->setPosition(Vec2(winSize.width / 2 + 20 + pP2Label->getContentSize().width, winSize.height - 30));
+	pP2ScoreLabel->setColor(Color3B::YELLOW);
+	pP2ScoreLabel->setTag(TAG_LABEL_P2SCORE);
+	this->addChild(pP2ScoreLabel, Z_ORDER_BACKGROND);
+
+	pTarget = Sprite::create("ball_target.png");
+	pTarget->setPosition((winSize.width / 2.0f) - 46, winSize.height - 300);
+	pTarget->setAnchorPoint(Vec2(0.5, 0.5));
+	pTarget->setOpacity(70);
+	pTarget->setScale(0.5f);
+	pTarget->setVisible(false);
+	this->addChild(pTarget, Z_ORDER_TARGET);
+
+	auto pTargetBall = Sprite::create("ball.png");
+	pTargetBall->setColor(Color3B::RED);
+	pTargetBall->setOpacity(90);
+	pTargetBall->setScale(2.0);
+	pTargetBall->setPosition(pTarget->getContentSize().width / 2.0, pTarget->getContentSize().height / 2.0);
+	pTargetBall->setTag(TAG_SPRITE_TARGET_BALL);
+	pTarget->addChild(pTargetBall);
+
+	auto pBtnTarget = MenuItemImage::create("btn_target1.png", "btn_target2.png", CC_CALLBACK_1(GameScene::setTarget, this));
+	auto pMenu = Menu::create(pBtnTarget, nullptr);
+	pMenu->setPosition(Vec2(winSize.width - 50, 100));
+	this->addChild(pMenu, Z_ORDER_BACKGROND);
+
 }
 
 void GameScene::initCue() {
@@ -218,6 +240,13 @@ void GameScene::initCue() {
 	pCuePower->setPosition(pCueBox->getContentSize().width / 2.0f, pCueBox->getContentSize().height / 2.0f);
 	pCueBox->addChild(pCuePower, Z_ORDER_CUE);
 
+	pArrow = Sprite::create("arrow.png");
+	pArrow->setAnchorPoint(Vec2(0.5, 0));
+	pArrow->setPosition(playerBall[curTurn]->getPosition().x, playerBall[curTurn]->getPosition().y);
+	pArrow->setScale(0.5);
+	pArrow->setOpacity(70.0f);
+	this->addChild(pArrow, Z_ORDER_CUE);
+
 	force = Vec2(0, 1);
 }
 
@@ -225,12 +254,29 @@ void GameScene::printScore(int player) {
 	std::stringstream sScore;
 
 	sScore << score[player];
-	dynamic_cast<LabelTTF*>(
-		this->getChildByTag(player))->setString(sScore.str());
+	dynamic_cast<LabelTTF*>(this->getChildByTag(player))->setString(sScore.str());
+}
+
+void GameScene::setTarget(Ref* sender) {
+	if (bTurn) {
+		bTarget = true;
+		pTarget->setVisible(true);
+	}
+}
+void GameScene::moveTagetBall(Vec2 oldPoint, Vec2 newPoint) {
+	
+	Vec2 moveVec = newPoint - oldPoint;
+	Vec2 centerVec = Vec2(pTarget->getContentSize().width / 2.0f, pTarget->getContentSize().height / 2.0f);
+	Sprite* pTargetBall = (Sprite*)pTarget->getChildByTag(TAG_SPRITE_TARGET_BALL);
+	Vec2 curVec = pTargetBall->getPosition();
+
+	if (((curVec + moveVec) - centerVec).length() < (pTarget->getContentSize().width / 2.0f) - 15) {
+		pTargetBall->setPosition(curVec + moveVec);
+	}
 }
 
 void GameScene::turnStart() {
-	turn = true;
+	bTurn = true;
 
 	playerBall[curTurn]->setTarget(false);
 
@@ -250,14 +296,19 @@ void GameScene::turnStart() {
 
 	pCue->setPosition(playerBall[curTurn]->getPosition().x, playerBall[curTurn]->getPosition().y);
 	pCue->setVisible(true);
+	pArrow->setPosition(playerBall[curTurn]->getPosition().x, playerBall[curTurn]->getPosition().y);
+	pArrow->setVisible(true);
 }
 
 void GameScene::turnEnd() {
 	power = 0;
 	pCuePower->setPosition(pCueBox->getContentSize().width / 2.0f, pCueBox->getContentSize().height / 2.0f);
 	pCue->setVisible(false);
+	pArrow->setVisible(false);
 	force.normalize();
-	turn = false;
+	bTurn = false;
+	auto pTargetBall = (Sprite*)pTarget->getChildByTag(TAG_SPRITE_TARGET_BALL);
+	pTargetBall->setPosition(pTarget->getContentSize().width / 2.0, pTarget->getContentSize().height / 2.0);
 }
 
 void GameScene::onEnter() {
@@ -282,7 +333,7 @@ void GameScene::onExit() {
 
 bool GameScene::onTouchBegan(Touch *touch, Event *event) {
 	auto touchPoint = touch->getLocation();
-	if (turn) {
+	if (bTurn) {
 		if (pCueBox->getBoundingBox().containsPoint(touchPoint)) {
 			bSelect = false;
 		}
@@ -298,42 +349,59 @@ void GameScene::onTouchMoved(Touch *touch, Event *event) {
 	Vec2 oldPoint = touch->getPreviousLocation();
 	Vec2 newPoint = touch->getLocation();
 
-	if (turn) {
-		if (bSelect) {
-			Vec2 firstVector = oldPoint - pCue->getPosition();
-			float firstRotateAngle = -firstVector.getAngle();
-			float previousTouch = CC_RADIANS_TO_DEGREES(firstRotateAngle);
-
-			Vec2 secondVector = newPoint - pCue->getPosition();
-			float secondRotateAngle = -secondVector.getAngle();
-			float currentTouch = CC_RADIANS_TO_DEGREES(secondRotateAngle);
-
-			force = force.rotateByAngle(Vec2::ZERO, firstRotateAngle - secondRotateAngle);
-			gRotation += currentTouch - previousTouch;
-			gRotation = fmod(gRotation, 360.0f);
-			pCue->setRotation(gRotation);
+	if (bTurn) {
+		if (bTarget) {
+			moveTagetBall(oldPoint, newPoint);
 		}
 		else {
-			power += (oldPoint.y - newPoint.y);
-			if (power > pCueBox->getContentSize().height)
-				power = pCueBox->getContentSize().height;
-			if (power < 0)
-				power = 0;
-			pCuePower->setPositionY(pCueBox->getContentSize().height / 2.0f - power);
+			if (bSelect) {
+				Vec2 firstVector = oldPoint - pCue->getPosition();
+				float firstRotateAngle = -firstVector.getAngle();
+				float previousTouch = CC_RADIANS_TO_DEGREES(firstRotateAngle);
+
+				Vec2 secondVector = newPoint - pCue->getPosition();
+				float secondRotateAngle = -secondVector.getAngle();
+				float currentTouch = CC_RADIANS_TO_DEGREES(secondRotateAngle);
+
+				gRotation += currentTouch - previousTouch;
+				gRotation = fmod(gRotation, 360.0f);
+
+				force = force.rotateByAngle(Vec2::ZERO, firstRotateAngle - secondRotateAngle);
+				pCue->setRotation(gRotation);
+				pArrow->setRotation(gRotation);
+			}
+			else {
+				power += (oldPoint.y - newPoint.y);
+				if (power > pCueBox->getContentSize().height)
+					power = pCueBox->getContentSize().height;
+				if (power < 0)
+					power = 0;
+				pCuePower->setPositionY(pCueBox->getContentSize().height / 2.0f - power);
+			}
 		}
 	}
 }
 
 void GameScene::onTouchEnded(Touch *touch, Event *event) {
-	if (turn) {
-		if (bSelect) {
-			bSelect = false;
+	if (bTurn) {
+		if (bTarget) {
+			auto pTargetBall = (Sprite*)pTarget->getChildByTag(TAG_SPRITE_TARGET_BALL);
+			pTarget->setVisible(false);
+			//////////////////////
+			////각속도값 전달/////
+			//////////////////////
+			bTarget = false;
 		}
 		else {
-			force *= (power * POWER);
-			b2Vec2 bForce = b2Vec2(force.x / PTM_RATIO, force.y / PTM_RATIO);
-			playerBall[curTurn]->getBody()->ApplyForceToCenter(bForce, true);
-			turnEnd();
+			if (bSelect) {
+				bSelect = false;
+			}
+			else {
+				force *= (power * POWER);
+				b2Vec2 bForce = b2Vec2(force.x / PTM_RATIO, force.y / PTM_RATIO);
+				playerBall[curTurn]->getBody()->ApplyForceToCenter(bForce, true);
+				turnEnd();
+			}
 		}
 	}
 }
