@@ -23,7 +23,7 @@ bool GameScene::init()
 	isPhysical = false;
 	turn = true;
 	score[0] = 0;
-	score[1] = 1;
+	score[1] = 0;
 
 	if (createBox2dWorld()) {
 		this->schedule(schedule_selector(GameScene::tick));
@@ -221,6 +221,14 @@ void GameScene::initCue() {
 	force = Vec2(0, 1);
 }
 
+void GameScene::printScore(int player) {
+	std::stringstream sScore;
+
+	sScore << score[player];
+	dynamic_cast<LabelTTF*>(
+		this->getChildByTag(player))->setString(sScore.str());
+}
+
 void GameScene::turnStart() {
 	turn = true;
 
@@ -231,7 +239,7 @@ void GameScene::turnStart() {
 		score[curTurn] += 10;
 
 		//점수 출력
-
+		printScore(curTurn);
 	}
 	else {
 		curTurn++;

@@ -5,6 +5,7 @@
 #include "Box2D/Box2D.h"
 #include "BilliardBall.h"
 #include "ContactListener.h"
+#include <stdlib.h>
 
 class GameScene : public cocos2d::LayerColor
 {
@@ -23,7 +24,7 @@ public:
 		b2Body* createBall(Vec2 position, BilliardBall* pBilliardBall);
 	void initBackGround();
 	void initCue();
-	void printScore();
+	void printScore(int player);
 
 	void turnStart();
 	void turnEnd();
