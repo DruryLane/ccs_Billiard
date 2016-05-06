@@ -25,6 +25,31 @@ void BilliardBall::initAngularVelocity(Vec2 targetPosition) {
 	log("angularVelocity init %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z);
 }
 
+void BilliardBall::updateBilliardBall(float dt) {
+	updateSprite();
+	//updateVelocity(dt);			//각운동량 반영한 속도
+	updateLinearVelocity(dt);		//운동마찰력
+	//updateAngualrVelocity(dt);	//구름마찰력
+}
+
+void BilliardBall::updateSprite() {
+	pSprite->setPosition(Vec2(pBody->GetPosition().x * PTM_RATIO, pBody->GetPosition().y * PTM_RATIO));
+	pSprite->setRotation(-1 * CC_RADIANS_TO_DEGREES(pBody->GetAngle()));
+}
+
+void BilliardBall::updateLinearVelocity(float dt) {
+	b2Vec2 dv = pBody->GetLinearVelocity();
+	dv.Normalize();
+	dv = -1 * FRICTION1 * dt * dv;
+	log("%f %f", dv.x, dv.y);
+	if (dv.Length() < pBody->GetLinearVelocity().Length()) {
+		pBody->SetLinearVelocity(pBody->GetLinearVelocity() + dv);
+	}
+	else {
+		pBody->SetLinearVelocity(b2Vec2_zero);
+	}
+}
+
 Sprite* BilliardBall::getSprite() {
 	return pSprite;
 }

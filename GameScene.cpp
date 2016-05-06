@@ -52,11 +52,7 @@ void GameScene::tick(float dt) {
 	for (b2Body *b = _world->GetBodyList(); b; b = b->GetNext()) {
 		if (b->GetUserData() != nullptr) {
 			BilliardBall* billiardBall = (BilliardBall*)b->GetUserData();
-			Sprite* spriteData = billiardBall->getSprite();
-			spriteData->setPosition(
-				Vec2(b->GetPosition().x * PTM_RATIO,
-					b->GetPosition().y * PTM_RATIO));
-			spriteData->setRotation(-1 * CC_RADIANS_TO_DEGREES(b->GetAngle()));
+			billiardBall->updateBilliardBall(dt);
 
 			if (b->GetLinearVelocity().Length()) {
 				isPhysical = true;
@@ -136,7 +132,7 @@ b2Body* GameScene::createBall(Vec2 position, BilliardBall* pBilliardBall) {
 	bodyDef.userData = pBilliardBall;
 
 	b2Body* ballBody = _world->CreateBody(&bodyDef);
-	ballBody->SetLinearDamping(0.5f);
+	//ballBody->SetLinearDamping(0.5f);
 	//원모양
 	b2CircleShape circle;
 	circle.m_radius = CIRCLE_RADIUS / PTM_RATIO;

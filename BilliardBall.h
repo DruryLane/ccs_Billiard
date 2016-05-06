@@ -1,6 +1,8 @@
 ﻿#ifndef __BILLIARD_BALL_H__
 #define __BILLIARD_BALL_H__
 
+#define FRICTION1	4.0f	//운동마찰력계수
+
 #include "GameManager.h"
 #include "Box2D/Box2D.h"
 
@@ -11,6 +13,10 @@ public:
 	BilliardBall(Color3B color, int num);
 
 	void initAngularVelocity(Vec2 targetPosition);
+	void updateBilliardBall(float dt);
+
+	void updateSprite();
+	void updateLinearVelocity(float dt);
 	
 	Sprite* getSprite();
 	b2Body* getBody();
