@@ -11,8 +11,13 @@ BilliardBall::BilliardBall(Color3B color, int num)
 }
 
 void BilliardBall::initAngularVelocity(Vec2 targetPosition) {
-	float x = sqrt(1 - targetPosition.lengthSquared());
-	Vec3 m_targetPosition = Vec3(targetPosition.x, x, targetPosition.y);
+	float y = -sqrt(1 - targetPosition.lengthSquared());
+	Vec2 coordY = Vec2(pBody->GetLinearVelocity().x, pBody->GetLinearVelocity().y);
+	coordY.normalize();
+	Vec2 coordX = Vec2(coordY.y, -coordY.x);
+	Vec3 m_targetPosition = Vec3(coordX.x * targetPosition.x + coordY.x * y, coordX.y * targetPosition.x + coordY.y * y, targetPosition.y);
+	//log("%f %f %f", m_targetPosition.x, m_targetPosition.y, m_targetPosition.z);
+
 	angularVelocity = m_targetPosition;
 	angularVelocity = CIRCLE_RADIUS * angularVelocity;
 	angularVelocity.cross(Vec3(pBody->GetLinearVelocity().x, pBody->GetLinearVelocity().y, 0));
