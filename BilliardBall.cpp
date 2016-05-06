@@ -16,6 +16,7 @@ void BilliardBall::initAngularVelocity(Vec2 targetPosition) {
 	angularVelocity = m_targetPosition;
 	angularVelocity = CIRCLE_RADIUS * angularVelocity;
 	angularVelocity.cross(Vec3(pBody->GetLinearVelocity().x, pBody->GetLinearVelocity().y, 0));
+	angularVelocity = (2 * angularVelocity) / (5 * CIRCLE_RADIUS * CIRCLE_RADIUS);
 	log("angularVelocity init %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z);
 }
 
