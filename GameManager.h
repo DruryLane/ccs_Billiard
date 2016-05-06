@@ -2,7 +2,7 @@
 #define __GAME_MANAGER_H__
 
 #define PTM_RATIO	32
-#define POWER		100
+#define POWER		2.0f
 #define CIRCLE_SCALE	2.2
 #define CIRCLE_RADIUS	CIRCLE_SCALE * 8.0
 

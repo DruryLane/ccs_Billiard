@@ -10,6 +10,15 @@ BilliardBall::BilliardBall(Color3B color, int num)
 	pSprite->setColor(color);
 }
 
+void BilliardBall::initAngularVelocity(Vec2 targetPosition) {
+	float x = sqrt(1 - targetPosition.lengthSquared());
+	Vec3 m_targetPosition = Vec3(targetPosition.x, x, targetPosition.y);
+	angularVelocity = m_targetPosition;
+	angularVelocity = CIRCLE_RADIUS * angularVelocity;
+	angularVelocity.cross(Vec3(pBody->GetLinearVelocity().x, pBody->GetLinearVelocity().y, 0));
+	log("angularVelocity init %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z);
+}
+
 Sprite* BilliardBall::getSprite() {
 	return pSprite;
 }
@@ -45,4 +54,8 @@ void BilliardBall::setTarget(bool t) {
 
 void BilliardBall::setBallNum(int num) {
 	ballNum = num;
+}
+
+void BilliardBall::setAngularVelocity(Vec3 m_angularVelocity) {
+	angularVelocity = m_angularVelocity;
 }

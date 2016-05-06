@@ -9,6 +9,8 @@ USING_NS_CC;
 class BilliardBall {
 public:
 	BilliardBall(Color3B color, int num);
+
+	void initAngularVelocity(Vec2 targetPosition);
 	
 	Sprite* getSprite();
 	b2Body* getBody();
@@ -20,6 +22,7 @@ public:
 	void setBody(b2Body* body);
 	void setTarget(bool t);
 	void setBallNum(int num);
+	void setAngularVelocity(Vec3 m_angularVelocity);
 
 private:
 	Sprite* pSprite;
@@ -27,6 +30,7 @@ private:
 	bool target;
 	int ballNum;
 	float32 mass;
+	Vec3 angularVelocity;
 };
 
 #endif // __BILLIARD_BALL_H__

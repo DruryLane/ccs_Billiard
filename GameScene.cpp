@@ -385,11 +385,7 @@ void GameScene::onTouchMoved(Touch *touch, Event *event) {
 void GameScene::onTouchEnded(Touch *touch, Event *event) {
 	if (bTurn) {
 		if (bTarget) {
-			auto pTargetBall = (Sprite*)pTarget->getChildByTag(TAG_SPRITE_TARGET_BALL);
 			pTarget->setVisible(false);
-			//////////////////////
-			////각속도값 전달/////
-			//////////////////////
 			bTarget = false;
 		}
 		else {
@@ -397,9 +393,20 @@ void GameScene::onTouchEnded(Touch *touch, Event *event) {
 				bSelect = false;
 			}
 			else {
+				//당구공에 힘전달
+				b2Body* pBody = playerBall[curTurn]->getBody();
 				force *= (power * POWER);
 				b2Vec2 bForce = b2Vec2(force.x / PTM_RATIO, force.y / PTM_RATIO);
-				playerBall[curTurn]->getBody()->ApplyForceToCenter(bForce, true);
+				pBody->ApplyLinearImpulse(bForce, pBody->GetPosition(), true);
+
+				//targetPosition 전달 후 각속도값 계산
+				auto pTargetBall = (Sprite*)pTarget->getChildByTag(TAG_SPRITE_TARGET_BALL);
+				Vec2 targetPosition;
+				targetPosition = pTargetBall->getPosition() - Vec2(pTarget->getContentSize().width / 2.0, pTarget->getContentSize().height / 2.0f);
+				targetPosition = targetPosition / (pTarget->getContentSize().width / 2.0);
+				playerBall[curTurn]->initAngularVelocity(targetPosition);
+
+				//턴종료
 				turnEnd();
 			}
 		}
