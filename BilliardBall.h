@@ -1,7 +1,9 @@
 ﻿#ifndef __BILLIARD_BALL_H__
 #define __BILLIARD_BALL_H__
 
-#define FRICTION1	4.0f	//운동마찰력계수
+#define FRICTION_SLIDE	30.0f	//미끄럼 마찰력계수
+#define FRICTION_ROLLING1	0.01f	//구름 마찰력계수
+#define FRICTION_ROLLING2	0.005f
 
 #include "GameManager.h"
 #include "Box2D/Box2D.h"
@@ -17,6 +19,7 @@ public:
 
 	void updateSprite();
 	void updateLinearVelocity(float dt);
+	void updateAngualrVelocity(float dt);
 	
 	Sprite* getSprite();
 	b2Body* getBody();

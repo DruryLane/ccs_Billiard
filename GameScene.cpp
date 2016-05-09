@@ -226,13 +226,13 @@ void GameScene::initBackGround() {
 }
 
 void GameScene::initCue() {
-	pCue = Sprite::create("Cue.png");
+	pCue = Sprite::create("cue.png");
 	pCue->setAnchorPoint(Vec2(0.5, 1.2));
 	pCue->setPosition(playerBall[curTurn]->getPosition().x, playerBall[curTurn]->getPosition().y);
 	pCue->setScale(0.4);
 	this->addChild(pCue, Z_ORDER_CUE);
 
-	pCuePower = Sprite::create("Cue.png");
+	pCuePower = Sprite::create("cue.png");
 	pCuePower->setPosition(pCueBox->getContentSize().width / 2.0f, pCueBox->getContentSize().height / 2.0f);
 	pCueBox->addChild(pCuePower, Z_ORDER_CUE);
 

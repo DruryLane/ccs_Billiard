@@ -22,14 +22,14 @@ void BilliardBall::initAngularVelocity(Vec2 targetPosition) {
 	angularVelocity = CIRCLE_RADIUS * angularVelocity;
 	angularVelocity.cross(Vec3(pBody->GetLinearVelocity().x, pBody->GetLinearVelocity().y, 0));
 	angularVelocity = (2 * angularVelocity) / (5 * CIRCLE_RADIUS * CIRCLE_RADIUS);
-	log("angularVelocity init %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z);
+	//log("angularVelocity init %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z);
 }
 
 void BilliardBall::updateBilliardBall(float dt) {
+	log("%f %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z, angularVelocity.length());
 	updateSprite();
-	//updateVelocity(dt);			//각운동량 반영한 속도
-	updateLinearVelocity(dt);		//운동마찰력
-	//updateAngualrVelocity(dt);	//구름마찰력
+	updateLinearVelocity(dt);	//선운동
+	//updateAngualrVelocity(dt);	//각운동
 }
 
 void BilliardBall::updateSprite() {
@@ -38,16 +38,48 @@ void BilliardBall::updateSprite() {
 }
 
 void BilliardBall::updateLinearVelocity(float dt) {
+	//미끄럼마찰력으로 인한 속도 변화
 	b2Vec2 dv = pBody->GetLinearVelocity();
 	dv.Normalize();
-	dv = -1 * FRICTION1 * dt * dv;
-	log("%f %f", dv.x, dv.y);
+	dv = -1 * FRICTION_SLIDE * dt * dv;
+	//log("%f %f", dv.x, dv.y);
 	if (dv.Length() < pBody->GetLinearVelocity().Length()) {
 		pBody->SetLinearVelocity(pBody->GetLinearVelocity() + dv);
 	}
 	else {
+		dv = pBody->GetLinearVelocity();
 		pBody->SetLinearVelocity(b2Vec2_zero);
 	}
+
+	//미끄럼마찰력으로 인한 회전력 발생
+	Vec3 v3dv = (5 / (2 * CIRCLE_RADIUS * CIRCLE_RADIUS)) * Vec3(dv.x, dv.y, 0);
+	Vec3 w = Vec3(0, 0, -CIRCLE_RADIUS);
+	w.cross(v3dv);
+	angularVelocity += w;
+}
+
+void BilliardBall::updateAngualrVelocity(float dt) {
+	//구름 마찰력으로 인한 회전력 변화
+	Vec3 dw = angularVelocity;
+	dw.normalize();
+	dw *= FRICTION_ROLLING1;
+
+	if (fabsf(angularVelocity.x) < fabsf(dw.x)) {
+		dw.x = angularVelocity.x;
+	}
+
+	if (fabsf(angularVelocity.y) < fabsf(dw.y)) {
+		dw.y = angularVelocity.y;
+	}
+
+	if (fabsf(angularVelocity.z) < fabsf(dw.z)) {
+		dw.z = angularVelocity.z;
+	}
+
+	Vec3 r = Vec3(0, 0, -CIRCLE_RADIUS);
+	r.cross(dw);
+	angularVelocity += dw;
+	pBody->SetLinearVelocity(pBody->GetLinearVelocity() + b2Vec2(r.x, r.y));
 }
 
 Sprite* BilliardBall::getSprite() {
