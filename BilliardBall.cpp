@@ -4,6 +4,7 @@ BilliardBall::BilliardBall(Color3B color, int num)
 {
 	target = false;
 	ballNum = num;
+	linearA = b2Vec2_zero;
 
 	pSprite = Sprite::create("ball.png");
 	pSprite->setScale(CIRCLE_SCALE);
@@ -22,14 +23,19 @@ void BilliardBall::initAngularVelocity(Vec2 targetPosition) {
 	angularVelocity = CIRCLE_RADIUS * angularVelocity;
 	angularVelocity.cross(Vec3(pBody->GetLinearVelocity().x, pBody->GetLinearVelocity().y, 0));
 	angularVelocity = (2 * angularVelocity) / (5 * CIRCLE_RADIUS * CIRCLE_RADIUS);
-	//log("angularVelocity init %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z);
+	log("angularVelocity init %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z);
+
+	//각속도에 의한 속도변화
+	linearA = angularToLinear(angularVelocity);
+	pBody->SetLinearVelocity(pBody->GetLinearVelocity() + linearA);
+
 }
 
 void BilliardBall::updateBilliardBall(float dt) {
 	log("%f %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z, angularVelocity.length());
 	updateSprite();
 	updateLinearVelocity(dt);	//선운동
-	//updateAngualrVelocity(dt);	//각운동
+	updateAngualrVelocity(dt);	//각운동
 }
 
 void BilliardBall::updateSprite() {
@@ -39,47 +45,35 @@ void BilliardBall::updateSprite() {
 
 void BilliardBall::updateLinearVelocity(float dt) {
 	//미끄럼마찰력으로 인한 속도 변화
-	b2Vec2 dv = pBody->GetLinearVelocity();
+	b2Vec2 dv = pBody->GetLinearVelocity() - linearA;
 	dv.Normalize();
 	dv = -1 * FRICTION_SLIDE * dt * dv;
 	//log("%f %f", dv.x, dv.y);
-	if (dv.Length() < pBody->GetLinearVelocity().Length()) {
+	if (dv.Length() < (pBody->GetLinearVelocity() - linearA).Length()) {
 		pBody->SetLinearVelocity(pBody->GetLinearVelocity() + dv);
 	}
 	else {
-		dv = pBody->GetLinearVelocity();
-		pBody->SetLinearVelocity(b2Vec2_zero);
+		pBody->SetLinearVelocity(linearA);
 	}
-
-	//미끄럼마찰력으로 인한 회전력 발생
-	Vec3 v3dv = (5 / (2 * CIRCLE_RADIUS * CIRCLE_RADIUS)) * Vec3(dv.x, dv.y, 0);
-	Vec3 w = Vec3(0, 0, -CIRCLE_RADIUS);
-	w.cross(v3dv);
-	angularVelocity += w;
 }
 
 void BilliardBall::updateAngualrVelocity(float dt) {
 	//구름 마찰력으로 인한 회전력 변화
 	Vec3 dw = angularVelocity;
 	dw.normalize();
-	dw *= FRICTION_ROLLING1;
+	dw = -FRICTION_ROLLING * dt * dw;
 
-	if (fabsf(angularVelocity.x) < fabsf(dw.x)) {
-		dw.x = angularVelocity.x;
+	if (angularVelocity.length() > dw.length()) {
+		angularVelocity += dw;
+	}
+	else {
+		dw = angularVelocity;
+		angularVelocity = Vec3::ZERO;
 	}
 
-	if (fabsf(angularVelocity.y) < fabsf(dw.y)) {
-		dw.y = angularVelocity.y;
-	}
-
-	if (fabsf(angularVelocity.z) < fabsf(dw.z)) {
-		dw.z = angularVelocity.z;
-	}
-
-	Vec3 r = Vec3(0, 0, -CIRCLE_RADIUS);
-	r.cross(dw);
-	angularVelocity += dw;
-	pBody->SetLinearVelocity(pBody->GetLinearVelocity() + b2Vec2(r.x, r.y));
+	pBody->SetLinearVelocity(pBody->GetLinearVelocity() - linearA);
+	linearA = angularToLinear(angularVelocity);
+	pBody->SetLinearVelocity(pBody->GetLinearVelocity() + linearA);
 }
 
 Sprite* BilliardBall::getSprite() {
@@ -121,4 +115,14 @@ void BilliardBall::setBallNum(int num) {
 
 void BilliardBall::setAngularVelocity(Vec3 m_angularVelocity) {
 	angularVelocity = m_angularVelocity;
+}
+
+b2Vec2 BilliardBall::angularToLinear(Vec3 m_angularVelocity) {
+	b2Vec2 m_velocity;
+	Vec3 r = Vec3(0, 0, -CIRCLE_RADIUS);
+
+	r.cross(m_angularVelocity);
+	m_velocity = b2Vec2(r.x, r.y);
+
+	return m_velocity;
 }
