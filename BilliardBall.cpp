@@ -55,7 +55,7 @@ void BilliardBall::updateLinearVelocity(float dt) {
 	else {
 		pBody->SetLinearVelocity(linearA);
 	}
-}
+}  
 
 void BilliardBall::updateAngualrVelocity(float dt) {
 	//구름 마찰력으로 인한 회전력 변화

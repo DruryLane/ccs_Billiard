@@ -1,8 +1,8 @@
 #ifndef __GAME_MANAGER_H__
 #define __GAME_MANAGER_H__
 
-#define PTM_RATIO	32
-#define POWER		3.0f
+#define PTM_RATIO	64
+#define POWER		1.0f
 #define CIRCLE_SCALE	2.2
 #define CIRCLE_RADIUS	CIRCLE_SCALE * 8.0
 #define BALL_DENSITY	1.7f;
