@@ -22,17 +22,18 @@ void BilliardBall::initAngularVelocity(Vec2 targetPosition) {
 	angularVelocity = m_targetPosition;
 	angularVelocity = CIRCLE_RADIUS * angularVelocity;
 	angularVelocity.cross(Vec3(pBody->GetLinearVelocity().x, pBody->GetLinearVelocity().y, 0));
-	angularVelocity = (2 * angularVelocity) / (5 * CIRCLE_RADIUS * CIRCLE_RADIUS);
+	angularVelocity = (5 * angularVelocity) / (2 * CIRCLE_RADIUS * CIRCLE_RADIUS);
 	log("angularVelocity init %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z);
 
 	//각속도에 의한 속도변화
 	linearA = angularToLinear(angularVelocity);
 	pBody->SetLinearVelocity(pBody->GetLinearVelocity() + linearA);
-
+	pBody->SetAngularVelocity(angularVelocity.z);
 }
 
 void BilliardBall::updateBilliardBall(float dt) {
-	log("%f %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z, angularVelocity.length());
+	log("%f %f", linearA.x, linearA.y);
+	//log("%f %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z, pBody->GetAngularVelocity());
 	updateSprite();
 	updateLinearVelocity(dt);	//선운동
 	updateAngualrVelocity(dt);	//각운동
@@ -40,7 +41,7 @@ void BilliardBall::updateBilliardBall(float dt) {
 
 void BilliardBall::updateSprite() {
 	pSprite->setPosition(Vec2(pBody->GetPosition().x * PTM_RATIO, pBody->GetPosition().y * PTM_RATIO));
-	pSprite->setRotation(-1 * CC_RADIANS_TO_DEGREES(pBody->GetAngle()));
+	//pSprite->setRotation(-1 * CC_RADIANS_TO_DEGREES(pBody->GetAngle()));
 }
 
 void BilliardBall::updateLinearVelocity(float dt) {
@@ -58,17 +59,21 @@ void BilliardBall::updateLinearVelocity(float dt) {
 }  
 
 void BilliardBall::updateAngualrVelocity(float dt) {
+	angularVelocity.z = pBody->GetAngularVelocity();
+
 	//구름 마찰력으로 인한 회전력 변화
-	Vec3 dw = angularVelocity;
+	Vec2 dw = Vec2(angularVelocity.x, angularVelocity.y);
 	dw.normalize();
 	dw = -FRICTION_ROLLING * dt * dw;
 
-	if (angularVelocity.length() > dw.length()) {
-		angularVelocity += dw;
+	if (Vec2(angularVelocity.x, angularVelocity.y).length() > dw.length()) {
+		angularVelocity.x += dw.x;
+		angularVelocity.y += dw.y;
 	}
 	else {
-		dw = angularVelocity;
-		angularVelocity = Vec3::ZERO;
+		dw = Vec2(angularVelocity.x, angularVelocity.y);
+		angularVelocity.x = 0.0f;
+		angularVelocity.y = 0.0f;
 	}
 
 	pBody->SetLinearVelocity(pBody->GetLinearVelocity() - linearA);
@@ -124,5 +129,5 @@ b2Vec2 BilliardBall::angularToLinear(Vec3 m_angularVelocity) {
 	r.cross(m_angularVelocity);
 	m_velocity = b2Vec2(r.x, r.y);
 
-	return m_velocity;
+	return  ANGULAR_POWER * m_velocity;
 }

@@ -133,7 +133,7 @@ b2Body* GameScene::createBall(Vec2 position, BilliardBall* pBilliardBall) {
 
 	b2Body* ballBody = _world->CreateBody(&bodyDef);
 	//ballBody->SetLinearDamping(0.5f);
-	ballBody->SetAngularDamping(1.2f);
+	ballBody->SetAngularDamping(1.5f);
 	//원모양
 	b2CircleShape circle;
 	circle.m_radius = CIRCLE_RADIUS / PTM_RATIO;
@@ -142,7 +142,7 @@ b2Body* GameScene::createBall(Vec2 position, BilliardBall* pBilliardBall) {
 	fixtureDef.shape = &circle;
 	fixtureDef.density = BALL_DENSITY;
 	fixtureDef.friction = 0.3f;
-	fixtureDef.restitution = 0.96f;
+	fixtureDef.restitution = 1.00f;
 
 	ballBody->CreateFixture(&fixtureDef);
 	return ballBody;
