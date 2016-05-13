@@ -22,6 +22,7 @@ bool GameScene::init()
 	isPhysical = false;
 	bTurn = true;
 	bTarget = false;
+	bTest = true;
 	score[0] = 0;
 	score[1] = 0;
 
@@ -101,6 +102,9 @@ void GameScene::initBox2dWorld(b2Vec2 g) {
 	groundEdge.Set(b2Vec2(GROUND_X1 / PTM_RATIO, GROUND_Y2 / PTM_RATIO), b2Vec2(GROUND_X2 / PTM_RATIO, GROUND_Y2 / PTM_RATIO));
 	groundBody->CreateFixture(&boxShapeDef);
 
+	boxShapeDef.friction = 0.3f;
+	boxShapeDef.restitution = 0.7f;
+
 	myContactLstener = new ContactListener();
 	_world->SetContactListener((b2ContactListener*)myContactLstener);
 
@@ -121,6 +125,33 @@ void GameScene::initBall() {
 	otherBall2->setBody(createBall(Vec2(250, 550), otherBall2));
 }
 
+void GameScene::testBtn(Ref* sender) {
+	if (bTurn) {
+		if (bTest) {
+			this->removeChild(playerBall[PLAYER2]->getSprite(), true);
+			this->removeChild(otherBall2->getSprite(), true);
+
+			_world->DestroyBody(playerBall[PLAYER2]->getBody());
+			_world->DestroyBody(otherBall2->getBody());
+		}
+		this->removeChild(playerBall[PLAYER1]->getSprite(),true);
+		this->removeChild(otherBall1->getSprite(), true);
+		
+		_world->DestroyBody(playerBall[PLAYER1]->getBody());
+		_world->DestroyBody(otherBall1->getBody());
+
+		playerBall[PLAYER1]->initSprite(Color3B::RED);
+		otherBall1->initSprite(Color3B::WHITE);
+
+		playerBall[PLAYER1]->setBody(createBall(Vec2(150, 200), playerBall[PLAYER1]));
+		otherBall1->setBody(createBall(Vec2(200, 270), otherBall1));
+		
+		bTest = false;
+		curTurn = PLAYER1;
+		turnStart();
+	}
+}
+
 b2Body* GameScene::createBall(Vec2 position, BilliardBall* pBilliardBall) {
 	Sprite* pSprite = pBilliardBall->getSprite();
 	pSprite->setPosition(position.x, position.y);
@@ -133,7 +164,7 @@ b2Body* GameScene::createBall(Vec2 position, BilliardBall* pBilliardBall) {
 
 	b2Body* ballBody = _world->CreateBody(&bodyDef);
 	//ballBody->SetLinearDamping(0.5f);
-	ballBody->SetAngularDamping(1.5f);
+	ballBody->SetAngularDamping(0.8f);
 	//원모양
 	b2CircleShape circle;
 	circle.m_radius = CIRCLE_RADIUS / PTM_RATIO;
@@ -141,8 +172,8 @@ b2Body* GameScene::createBall(Vec2 position, BilliardBall* pBilliardBall) {
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &circle;
 	fixtureDef.density = BALL_DENSITY;
-	fixtureDef.friction = 0.3f;
-	fixtureDef.restitution = 1.00f;
+	fixtureDef.friction = 0.1f;
+	fixtureDef.restitution = 0.96f;
 
 	ballBody->CreateFixture(&fixtureDef);
 	return ballBody;
@@ -224,6 +255,12 @@ void GameScene::initBackGround() {
 	pMenu->setPosition(Vec2(winSize.width - 50, 100));
 	this->addChild(pMenu, Z_ORDER_BACKGROND);
 
+	auto pTestBtn = MenuItemImage::create("btn_target1.png", "btn_target2.png", CC_CALLBACK_1(GameScene::testBtn, this));
+	pTestBtn->setColor(Color3B::RED);
+	auto pTestMenu = Menu::create(pTestBtn, nullptr);
+	pTestMenu->setPosition(Vec2(winSize.width - 50, 170));
+	this->addChild(pTestMenu, Z_ORDER_BACKGROND);
+
 }
 
 void GameScene::initCue() {
@@ -285,8 +322,10 @@ void GameScene::turnStart() {
 		printScore(curTurn);
 	}
 	else {
-		curTurn++;
-		curTurn %= 2;
+		if (bTest) {
+			curTurn++;
+			curTurn %= 2;
+		}
 	}
 
 	playerBall[curTurn]->setTarget(true);

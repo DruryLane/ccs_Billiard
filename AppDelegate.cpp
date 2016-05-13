@@ -35,7 +35,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	auto director = Director::getInstance();
 	auto glview = director->getOpenGLView();
 	if (!glview) {
-		glview = GLViewImpl::create("ResolustionEx1");
+		glview = GLViewImpl::create("BilliardBall");
 		//glview = GLViewImpl::createWithRect("ResolutionEx", Rect(0, 0, 600, 320));
 		director->setOpenGLView(glview);
 }
@@ -46,7 +46,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	// set FPS. the default value is 1.0/60 if you don't call this
 	director->setAnimationInterval(1.0 / 60);
 
-	glview->setFrameSize(500, 800);
+	glview->setFrameSize(450, 700);
 	// Set the design resolution
 	glview->setDesignResolutionSize(
 		designResolutionSize.width,

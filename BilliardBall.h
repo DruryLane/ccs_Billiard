@@ -15,6 +15,7 @@ public:
 	BilliardBall(Color3B color, int num);
 
 	void initAngularVelocity(Vec2 targetPosition);
+	void initSprite(Color3B color);
 	
 	void updateBilliardBall(float dt);
 	void updateSprite();

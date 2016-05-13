@@ -28,6 +28,8 @@ public:
 	void setTarget(Ref* sender);
 	void moveTagetBall(Vec2 oldPoint, Vec2 newPoint);
 
+	void testBtn(Ref* sender);
+
 	void turnStart();
 	void turnEnd();
 	
@@ -56,6 +58,7 @@ public:
 	bool bTurn;
 	bool bSelect;
 	bool bTarget;
+	bool bTest;
 
 	int curTurn;
 	float power;

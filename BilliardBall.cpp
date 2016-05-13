@@ -11,6 +11,12 @@ BilliardBall::BilliardBall(Color3B color, int num)
 	pSprite->setColor(color);
 }
 
+void BilliardBall::initSprite(Color3B color) {
+	pSprite = Sprite::create("ball.png");
+	pSprite->setScale(CIRCLE_SCALE);
+	pSprite->setColor(color);
+}
+
 void BilliardBall::initAngularVelocity(Vec2 targetPosition) {
 	float y = -sqrt(1 - targetPosition.lengthSquared());
 	Vec2 coordY = Vec2(pBody->GetLinearVelocity().x, pBody->GetLinearVelocity().y);
@@ -28,11 +34,11 @@ void BilliardBall::initAngularVelocity(Vec2 targetPosition) {
 	//각속도에 의한 속도변화
 	linearA = angularToLinear(angularVelocity);
 	pBody->SetLinearVelocity(pBody->GetLinearVelocity() + linearA);
-	pBody->SetAngularVelocity(angularVelocity.z);
+	//pBody->SetLinearVelocity(b2Vec2_zero);
+	pBody->SetAngularVelocity(20 * angularVelocity.z);
 }
 
 void BilliardBall::updateBilliardBall(float dt) {
-	log("%f %f", linearA.x, linearA.y);
 	//log("%f %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z, pBody->GetAngularVelocity());
 	updateSprite();
 	updateLinearVelocity(dt);	//선운동
@@ -41,7 +47,7 @@ void BilliardBall::updateBilliardBall(float dt) {
 
 void BilliardBall::updateSprite() {
 	pSprite->setPosition(Vec2(pBody->GetPosition().x * PTM_RATIO, pBody->GetPosition().y * PTM_RATIO));
-	//pSprite->setRotation(-1 * CC_RADIANS_TO_DEGREES(pBody->GetAngle()));
+	pSprite->setRotation(-1* CC_RADIANS_TO_DEGREES(pBody->GetAngle()));
 }
 
 void BilliardBall::updateLinearVelocity(float dt) {
@@ -49,7 +55,7 @@ void BilliardBall::updateLinearVelocity(float dt) {
 	b2Vec2 dv = pBody->GetLinearVelocity() - linearA;
 	dv.Normalize();
 	dv = -1 * FRICTION_SLIDE * dt * dv;
-	//log("%f %f", dv.x, dv.y);
+	
 	if (dv.Length() < (pBody->GetLinearVelocity() - linearA).Length()) {
 		pBody->SetLinearVelocity(pBody->GetLinearVelocity() + dv);
 	}
