@@ -30,7 +30,7 @@ void ContactListener::BeginContact(b2Contact* contact){
 }
 
 void ContactListener::EndContact(b2Contact* contact){
-
+	
 }
 
 void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold){
@@ -53,5 +53,9 @@ void ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impu
 		else if (ballB->isTarget()) {
 			contactBall[ballA->getBallNum()] = true;
 		}
+		
+		CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(impulse->normalImpulses[0] * MUSIC_HIT_VOLUME);
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(MUSIC_HIT);
+		log("%f", impulse->normalImpulses[0]);
 	}
 }

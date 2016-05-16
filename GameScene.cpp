@@ -26,6 +26,7 @@ bool GameScene::init()
 	score[0] = 0;
 	score[1] = 0;
 
+	initSound();
 	if (createBox2dWorld()) {
 		this->schedule(schedule_selector(GameScene::tick));
 	}
@@ -103,7 +104,7 @@ void GameScene::initBox2dWorld(b2Vec2 g) {
 	groundBody->CreateFixture(&boxShapeDef);
 
 	boxShapeDef.friction = 0.3f;
-	boxShapeDef.restitution = 0.7f;
+	boxShapeDef.restitution = 1.2f;
 
 	myContactLstener = new ContactListener();
 	_world->SetContactListener((b2ContactListener*)myContactLstener);
@@ -111,17 +112,20 @@ void GameScene::initBox2dWorld(b2Vec2 g) {
 }
 
 void GameScene::initBall() {
-	playerBall[PLAYER1] = new BilliardBall(Color3B::RED, PLAYER1);
+	CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1.0f);
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(MUSIC_TURN);
+
+	playerBall[PLAYER1] = new BilliardBall(Color3B::WHITE, PLAYER1);
 	playerBall[PLAYER1]->setBody(createBall(Vec2(230, 450), playerBall[PLAYER1]));
 	playerBall[PLAYER1]->setTarget(true);
 
 	playerBall[PLAYER2] = new BilliardBall(Color3B::YELLOW, PLAYER2);
 	playerBall[PLAYER2]->setBody(createBall(Vec2(130, 200), playerBall[PLAYER2]));
 
-	otherBall1 = new BilliardBall(Color3B::WHITE, OTHER1);
+	otherBall1 = new BilliardBall(Color3B::RED, OTHER1);
 	otherBall1->setBody(createBall(Vec2(210, 550), otherBall1));
 
-	otherBall2 = new BilliardBall(Color3B::WHITE, OTHER2);
+	otherBall2 = new BilliardBall(Color3B::RED, OTHER2);
 	otherBall2->setBody(createBall(Vec2(250, 550), otherBall2));
 }
 
@@ -193,6 +197,11 @@ GameScene::~GameScene() {
 	otherBall1 = nullptr;
 	otherBall2 = nullptr;
 	myContactLstener = nullptr;
+}
+
+void GameScene::initSound() {
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect(MUSIC_HIT);
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect(MUSIC_TURN);
 }
 
 void GameScene::initBackGround() {
@@ -312,6 +321,8 @@ void GameScene::moveTagetBall(Vec2 oldPoint, Vec2 newPoint) {
 void GameScene::turnStart() {
 	bTurn = true;
 
+	CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1.0f);
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(MUSIC_TURN);
 	playerBall[curTurn]->setTarget(false);
 
 	if (myContactLstener->isScore()) {

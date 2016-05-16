@@ -2,10 +2,12 @@
 #define __GAME_MANAGER_H__
 
 #define PTM_RATIO	64
-#define POWER		1.0f
+#define POWER		0.6f
 #define CIRCLE_SCALE	2.2
 #define CIRCLE_RADIUS	CIRCLE_SCALE * 8.0
 #define BALL_DENSITY	1.7f;
+
+#define MUSIC_HIT_VOLUME	0.2f
 
 #define PLAYER1		0
 #define PLAYER2		1
@@ -32,6 +34,15 @@
 #define TAG_SPRITE_TARGET_BALL	2
 
 #include "cocos2d.h"
+#include "SimpleAudioEngine.h"
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#define MUSIC_HIT	"hit.mp3"
+#define MUSIC_TURN	"drop.mp3"
+#else
+#define MUSIC_HIT	"hit.wav"
+#define MUSIC_TURN	"drop.wav"
+#endif
 
 USING_NS_CC;
 

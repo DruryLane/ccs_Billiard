@@ -24,6 +24,7 @@ public:
 		b2Body* createBall(Vec2 position, BilliardBall* pBilliardBall);
 	void initBackGround();
 	void initCue();
+	void initSound();
 	void printScore(int player);
 	void setTarget(Ref* sender);
 	void moveTagetBall(Vec2 oldPoint, Vec2 newPoint);
