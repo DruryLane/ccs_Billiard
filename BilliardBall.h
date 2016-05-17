@@ -2,8 +2,8 @@
 #define __BILLIARD_BALL_H__
 
 #define FRICTION_SLIDE		2.0f	//운동저항
-#define FRICTION_ROLLING	0.6f	//회전저항
-#define ANGULAR_POWER		0.2f
+#define FRICTION_ROLLING	12.0f	//회전저항
+#define ANGULAR_POWER		0.005f
 
 #include "GameManager.h"
 #include "Box2D/Box2D.h"

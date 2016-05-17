@@ -32,14 +32,16 @@ void BilliardBall::initAngularVelocity(Vec2 targetPosition) {
 	log("angularVelocity init %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z);
 
 	//각속도에 의한 속도변화
+	angularVelocity *= 20;
 	linearA = angularToLinear(angularVelocity);
 	pBody->SetLinearVelocity(pBody->GetLinearVelocity() + linearA);
-	//pBody->SetLinearVelocity(b2Vec2_zero);
-	pBody->SetAngularVelocity(20 * angularVelocity.z);
+	//pBody->SetLinearVelocity(linearA);
+	pBody->SetAngularVelocity(angularVelocity.z);
 }
 
 void BilliardBall::updateBilliardBall(float dt) {
 	//log("%f %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z, pBody->GetAngularVelocity());
+	log("%f %f", linearA.x, linearA.y);
 	updateSprite();
 	updateLinearVelocity(dt);	//선운동
 	updateAngualrVelocity(dt);	//각운동
