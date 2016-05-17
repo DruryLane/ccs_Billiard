@@ -28,10 +28,12 @@
 #define Z_ORDER_BALL		2
 #define Z_ORDER_CUE			3
 #define Z_ORDER_TARGET		4
+#define Z_ORDER_NEW_LAYER	5
 
 #define TAG_LABEL_P1SCORE	0
 #define TAG_LABEL_P2SCORE	1
 #define TAG_SPRITE_TARGET_BALL	2
+#define TAG_LAYER_EXIT		3
 
 #include "cocos2d.h"
 #include "SimpleAudioEngine.h"

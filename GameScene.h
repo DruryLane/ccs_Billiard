@@ -17,6 +17,9 @@ public:
     CREATE_FUNC(GameScene);
 
 	void doMsgReceived(Ref* obj);
+	void doExitBtn(Ref* obj);
+	void doExit(Ref* obj);
+	void doCancel(Ref* obj);
 	void tick(float dt);
 	bool createBox2dWorld();
 		void initBox2dWorld(b2Vec2 g);
@@ -37,7 +40,7 @@ public:
 	~GameScene();
 
 	virtual void onEnter();
-	virtual void onExit();
+	//virtual void onExit();
 	virtual bool onTouchBegan(Touch* touch, Event* event);
 	virtual void onTouchMoved(Touch* touch, Event* event);
 	virtual void onTouchEnded(Touch* touch, Event* event);

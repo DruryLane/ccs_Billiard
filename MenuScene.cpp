@@ -38,9 +38,14 @@ void MenuScene::initMenu() {
 	pMenuItem2->setColor(Color3B::BLACK);
 	pMenuItem2->setTag(_MODE_DOUBLE_);
 
-	pMenu = Menu::create(pMenuItem1, pMenuItem2, nullptr);
+	auto pMenuItem3 = MenuItemFont::create(
+		"EXIT", CC_CALLBACK_1(MenuScene::doExit, this));
+	pMenuItem3->setColor(Color3B::BLACK);
+
+	pMenu = Menu::create(pMenuItem1, pMenuItem2, pMenuItem3, nullptr);
 
 	pMenu->alignItemsVertically();
+	pMenu->alignItemsVerticallyWithPadding(30.0f);
 	pMenu->setPosition(Vec2(winSize.width / 2.0f, winSize.height / 2.0f));
 
 	NotificationCenter::getInstance()->addObserver(this,
@@ -61,12 +66,15 @@ void MenuScene::doPopup(Ref * obj) {
 	this->addChild(popWin, 2000, 2000);
 }
 void MenuScene::doMsgReceived(Ref* obj) {
-	option += (10*(int)obj);
+	option += 10*(int)obj;
 	log("MenuScene[%d]  메세지 도착", option);
 
 	NotificationCenter::getInstance()->postNotification("Game_Scene", (Ref*)option);
-	
+
 	auto pScene = GameScene::createScene();
 	Director::getInstance()->replaceScene(pScene);
+}
 
+void MenuScene::doExit(Ref* obj) {
+	Director::getInstance()->end();
 }

@@ -41,6 +41,47 @@ void GameScene::doMsgReceived(Ref* obj) {
 	log("GameScene[%d]  메세지 도착", option);
 }
 
+void GameScene::doExitBtn(Ref* obj) {
+
+	auto backLayer = LayerColor::create(Color4B(0, 0, 0, 100), winSize.width, winSize.height);
+	backLayer->setAnchorPoint(Vec2(0, 0));
+	backLayer->setPosition(Vec2(0, 0));
+	backLayer->setTag(TAG_LAYER_EXIT);
+	this->addChild(backLayer, Z_ORDER_NEW_LAYER);
+
+	auto popLayer = CCLayerColor::create(Color4B(0, 255, 0, 255), 300, 200);
+	popLayer->setAnchorPoint(Vec2(0, 0));
+	popLayer->setPosition(Vec2(
+		(winSize.width - popLayer->getContentSize().width) / 2,
+		(winSize.height - popLayer->getContentSize().height) / 2)
+		);
+	backLayer->addChild(popLayer);
+
+	auto pMenuItem1 = MenuItemFont::create(
+		"Ok", CC_CALLBACK_1(GameScene::doExit, this));
+	pMenuItem1->setColor(Color3B(0, 0, 0));
+	pMenuItem1->setTag(_MODE_3_BALL_);
+
+	auto pMenuItem2 = MenuItemFont::create(
+		"Cancel", CC_CALLBACK_1(GameScene::doCancel, this));
+	pMenuItem2->setColor(Color3B(0, 0, 0));
+	pMenuItem2->setTag(_MODE_4_BALL_);
+
+	auto pMenu = Menu::create(pMenuItem1, pMenuItem2, nullptr);
+	pMenu->alignItemsHorizontallyWithPadding(10.0f);
+	pMenu->setPosition(Vec2(150, 100));
+	popLayer->addChild(pMenu);
+}
+
+void GameScene::doExit(Ref* obj) {
+	auto pScene = MenuScene::createScene();
+	Director::getInstance()->replaceScene(pScene);
+}
+
+void GameScene::doCancel(Ref* obj) {
+	this->removeChildByTag(TAG_LAYER_EXIT, true);
+}
+
 void GameScene::tick(float dt) {
 	int velocityInterations = 8;
 	int positionInterations = 3;
@@ -260,16 +301,18 @@ void GameScene::initBackGround() {
 	pTarget->addChild(pTargetBall);
 
 	auto pBtnTarget = MenuItemImage::create("btn_target1.png", "btn_target2.png", CC_CALLBACK_1(GameScene::setTarget, this));
-	auto pMenu = Menu::create(pBtnTarget, nullptr);
-	pMenu->setPosition(Vec2(winSize.width - 50, 100));
-	this->addChild(pMenu, Z_ORDER_BACKGROND);
+	auto pBtnTest = MenuItemImage::create("btn_target1.png", "btn_target2.png", CC_CALLBACK_1(GameScene::testBtn, this));
+	pBtnTest->setColor(Color3B::RED);
+	auto pMenuBtn = Menu::create(pBtnTarget, pBtnTest, nullptr);
+	pMenuBtn->setPosition(Vec2(winSize.width - 50, 100));
+	pMenuBtn->alignItemsVertically();
+	this->addChild(pMenuBtn, Z_ORDER_BACKGROND);
 
-	auto pTestBtn = MenuItemImage::create("btn_target1.png", "btn_target2.png", CC_CALLBACK_1(GameScene::testBtn, this));
-	pTestBtn->setColor(Color3B::RED);
-	auto pTestMenu = Menu::create(pTestBtn, nullptr);
-	pTestMenu->setPosition(Vec2(winSize.width - 50, 170));
-	this->addChild(pTestMenu, Z_ORDER_BACKGROND);
 
+	auto pBtnExit = MenuItemImage::create("CloseNormal.png", "CloseSelected.png", CC_CALLBACK_1(GameScene::doExitBtn, this));
+	auto pMenuExit = Menu::create(pBtnExit, nullptr);
+	pMenuExit->setPosition(Vec2(winSize.width - 40, winSize.height - 50));
+	this->addChild(pMenuExit, Z_ORDER_BACKGROND);
 }
 
 void GameScene::initCue() {
@@ -372,11 +415,11 @@ void GameScene::onEnter() {
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
-void GameScene::onExit() {
+/*void GameScene::onExit() {
 	_eventDispatcher->removeAllEventListeners();
 
 	Layer::onExit();
-}
+}*/
 
 bool GameScene::onTouchBegan(Touch *touch, Event *event) {
 	auto touchPoint = touch->getLocation();
