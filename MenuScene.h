@@ -18,7 +18,6 @@ public:
 	void doMsgReceived(Ref* obj);
 	void doExit(Ref* obj);
 
-	int option;
 	Menu* pMenu;
 };
 

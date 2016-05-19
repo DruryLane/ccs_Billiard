@@ -16,7 +16,6 @@ public:
     
     CREATE_FUNC(GameScene);
 
-	void doMsgReceived(Ref* obj);
 	void doExitBtn(Ref* obj);
 	void doExit(Ref* obj);
 	void doCancel(Ref* obj);
@@ -69,6 +68,7 @@ public:
 	float gRotation;
 	
 	int score[2];
+	int option;
 };
 
 #endif // __GAME_SCENE_H__

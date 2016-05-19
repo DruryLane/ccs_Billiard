@@ -7,7 +7,7 @@
 #define CIRCLE_RADIUS	CIRCLE_SCALE * 8.0
 #define BALL_DENSITY	1.7f;
 
-#define MUSIC_HIT_VOLUME	0.2f
+#define MUSIC_HIT_VOLUME	0.4f
 
 #define PLAYER1		0
 #define PLAYER2		1

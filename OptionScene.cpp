@@ -55,8 +55,12 @@ void OptionScene::initMenu() {
 void OptionScene::doSelectOption(Ref* pSender) {
 
 	auto pMenuItem = (MenuItem*)pSender;
-	int option = pMenuItem->getTag();
+	int option = (pMenuItem->getTag())*10;
+	option += UserDefault::getInstance()->getIntegerForKey("mode");
 
-	NotificationCenter::getInstance()->postNotification("Menu_Scene", (Ref*)option);
+	UserDefault::getInstance()->setIntegerForKey("mode", option);
+	UserDefault::getInstance()->flush();
+
+	NotificationCenter::getInstance()->postNotification("Menu_Scene", pSender);
 	this->removeFromParentAndCleanup(true);
 }

@@ -18,7 +18,6 @@ bool MenuScene::init()
 	{
 		return false;
 	}
-	option = 0;
 
 	initMenu();
     
@@ -49,8 +48,6 @@ void MenuScene::initMenu() {
 	pMenu->setPosition(Vec2(winSize.width / 2.0f, winSize.height / 2.0f));
 
 	NotificationCenter::getInstance()->addObserver(this,
-		callfuncO_selector(GameScene::doMsgReceived), "Game_Scene", nullptr);
-	NotificationCenter::getInstance()->addObserver(this,
 		callfuncO_selector(MenuScene::doMsgReceived), "Menu_Scene", nullptr);
 
 	this->addChild(pMenu);
@@ -58,7 +55,10 @@ void MenuScene::initMenu() {
 
 void MenuScene::doPopup(Ref * obj) {
 	auto pMenuItem = (MenuItem*)obj;
-	option += pMenuItem->getTag();
+	int option = pMenuItem->getTag();
+
+	UserDefault::getInstance()->setIntegerForKey("mode", option);
+	UserDefault::getInstance()->flush();
 
 	Scene* popWin;
 	pMenu->setEnabled(false);
@@ -66,10 +66,7 @@ void MenuScene::doPopup(Ref * obj) {
 	this->addChild(popWin, 2000, 2000);
 }
 void MenuScene::doMsgReceived(Ref* obj) {
-	option += 10*(int)obj;
-	log("MenuScene[%d]  메세지 도착", option);
-
-	NotificationCenter::getInstance()->postNotification("Game_Scene", (Ref*)option);
+	log("MenuScene 메세지 도착");
 
 	auto pScene = GameScene::createScene();
 	Director::getInstance()->replaceScene(pScene);

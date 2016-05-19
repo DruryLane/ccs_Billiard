@@ -15,6 +15,7 @@ public:
 	~ContactListener();
 
 	bool isScore();
+	void setThreeBallCushion(int n);
 
 	virtual void BeginContact(b2Contact* contact);
 	virtual void EndContact(b2Contact* contact);
@@ -23,6 +24,8 @@ public:
 
 private:
 	bool contactBall[4];
+	int option;
+	int threeBallCushion;
 };
 
 #endif // __Box2d_ContactListener__

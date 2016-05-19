@@ -41,7 +41,7 @@ void BilliardBall::initAngularVelocity(Vec2 targetPosition) {
 
 void BilliardBall::updateBilliardBall(float dt) {
 	//log("%f %f %f %f", angularVelocity.x, angularVelocity.y, angularVelocity.z, pBody->GetAngularVelocity());
-	log("%f %f", linearA.x, linearA.y);
+	//log("%f %f", linearA.x, linearA.y);
 	updateSprite();
 	updateLinearVelocity(dt);	//선운동
 	updateAngualrVelocity(dt);	//각운동
@@ -49,7 +49,7 @@ void BilliardBall::updateBilliardBall(float dt) {
 
 void BilliardBall::updateSprite() {
 	pSprite->setPosition(Vec2(pBody->GetPosition().x * PTM_RATIO, pBody->GetPosition().y * PTM_RATIO));
-	pSprite->setRotation(-1* CC_RADIANS_TO_DEGREES(pBody->GetAngle()));
+	//pSprite->setRotation(-1* CC_RADIANS_TO_DEGREES(pBody->GetAngle()));
 }
 
 void BilliardBall::updateLinearVelocity(float dt) {
@@ -135,7 +135,7 @@ b2Vec2 BilliardBall::angularToLinear(Vec3 m_angularVelocity) {
 	Vec3 r = Vec3(0, 0, -CIRCLE_RADIUS);
 
 	r.cross(m_angularVelocity);
-	m_velocity = b2Vec2(r.x, r.y);
+	m_velocity = b2Vec2(ANGULAR_POWER * r.x, ANGULAR_POWER * r.y);
 
-	return  ANGULAR_POWER * m_velocity;
+	return m_velocity;
 }

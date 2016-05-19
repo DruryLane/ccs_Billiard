@@ -25,6 +25,7 @@ bool GameScene::init()
 	bTest = true;
 	score[0] = 0;
 	score[1] = 0;
+	option = UserDefault::getInstance()->getIntegerForKey("mode");
 
 	initSound();
 	if (createBox2dWorld()) {
@@ -34,11 +35,6 @@ bool GameScene::init()
 	initCue();
 
     return true;
-}
-
-void GameScene::doMsgReceived(Ref* obj) {
-	int option = (int)obj;
-	log("GameScene[%d]  메세지 도착", option);
 }
 
 void GameScene::doExitBtn(Ref* obj) {
@@ -74,6 +70,9 @@ void GameScene::doExitBtn(Ref* obj) {
 }
 
 void GameScene::doExit(Ref* obj) {
+
+	this->unschedule(schedule_selector(GameScene::tick));
+
 	auto pScene = MenuScene::createScene();
 	Director::getInstance()->replaceScene(pScene);
 }
@@ -145,7 +144,7 @@ void GameScene::initBox2dWorld(b2Vec2 g) {
 	groundBody->CreateFixture(&boxShapeDef);
 
 	boxShapeDef.friction = 0.3f;
-	boxShapeDef.restitution = 1.2f;
+	//boxShapeDef.restitution = 0.7f;
 
 	myContactLstener = new ContactListener();
 	_world->SetContactListener((b2ContactListener*)myContactLstener);
@@ -161,23 +160,26 @@ void GameScene::initBall() {
 	playerBall[PLAYER1]->setTarget(true);
 
 	playerBall[PLAYER2] = new BilliardBall(Color3B::YELLOW, PLAYER2);
-	playerBall[PLAYER2]->setBody(createBall(Vec2(130, 200), playerBall[PLAYER2]));
+	playerBall[PLAYER2]->setBody(createBall(Vec2(130, 200), playerBall[PLAYER2]));	
 
 	otherBall1 = new BilliardBall(Color3B::RED, OTHER1);
 	otherBall1->setBody(createBall(Vec2(210, 550), otherBall1));
-
-	otherBall2 = new BilliardBall(Color3B::RED, OTHER2);
-	otherBall2->setBody(createBall(Vec2(250, 550), otherBall2));
+	
+	if (option / 10 == _MODE_4_BALL_) {
+		otherBall2 = new BilliardBall(Color3B::RED, OTHER2);
+		otherBall2->setBody(createBall(Vec2(250, 550), otherBall2));
+	}
 }
 
 void GameScene::testBtn(Ref* sender) {
 	if (bTurn) {
 		if (bTest) {
+			if (option / 10 == _MODE_4_BALL_) {
+				this->removeChild(otherBall2->getSprite(), true);
+				_world->DestroyBody(otherBall2->getBody());
+			}
 			this->removeChild(playerBall[PLAYER2]->getSprite(), true);
-			this->removeChild(otherBall2->getSprite(), true);
-
 			_world->DestroyBody(playerBall[PLAYER2]->getBody());
-			_world->DestroyBody(otherBall2->getBody());
 		}
 		this->removeChild(playerBall[PLAYER1]->getSprite(),true);
 		this->removeChild(otherBall1->getSprite(), true);
@@ -218,7 +220,7 @@ b2Body* GameScene::createBall(Vec2 position, BilliardBall* pBilliardBall) {
 	fixtureDef.shape = &circle;
 	fixtureDef.density = BALL_DENSITY;
 	fixtureDef.friction = 0.1f;
-	fixtureDef.restitution = 0.96f;
+	fixtureDef.restitution = 0.8f;
 
 	ballBody->CreateFixture(&fixtureDef);
 	return ballBody;
@@ -261,28 +263,32 @@ void GameScene::initBackGround() {
 	auto pP1Label = LabelTTF::create("Player1 : ", "Arial", 30);
 	pP1Label->setAnchorPoint(Vec2(0, 1));
 	pP1Label->setPosition(Vec2(50, winSize.height - 30));
-	pP1Label->setColor(Color3B::RED);
+	pP1Label->setColor(Color3B::WHITE);
 	this->addChild(pP1Label, Z_ORDER_BACKGROND);
-
-	auto pP2Label = LabelTTF::create("Player2 : ", "Arial", 30);
-	pP2Label->setAnchorPoint(Vec2(0, 1));
-	pP2Label->setPosition(Vec2(winSize.width / 2 + 20, winSize.height - 30));
-	pP2Label->setColor(Color3B::YELLOW);
-	this->addChild(pP2Label, Z_ORDER_BACKGROND);
 
 	auto pP1ScoreLabel = LabelTTF::create("0", "Arial", 30);
 	pP1ScoreLabel->setAnchorPoint(Vec2(0, 1));
 	pP1ScoreLabel->setPosition(Vec2(50 + pP1Label->getContentSize().width, winSize.height - 30));
-	pP1ScoreLabel->setColor(Color3B::RED);
+	pP1ScoreLabel->setColor(Color3B::WHITE);
 	pP1ScoreLabel->setTag(TAG_LABEL_P1SCORE);
 	this->addChild(pP1ScoreLabel, Z_ORDER_BACKGROND);
 
-	auto pP2ScoreLabel = LabelTTF::create("0", "Arial", 30);
-	pP2ScoreLabel->setAnchorPoint(Vec2(0, 1));
-	pP2ScoreLabel->setPosition(Vec2(winSize.width / 2 + 20 + pP2Label->getContentSize().width, winSize.height - 30));
-	pP2ScoreLabel->setColor(Color3B::YELLOW);
-	pP2ScoreLabel->setTag(TAG_LABEL_P2SCORE);
-	this->addChild(pP2ScoreLabel, Z_ORDER_BACKGROND);
+	if (option % 10 == _MODE_DOUBLE_) {
+
+		auto pP2Label = LabelTTF::create("Player2 : ", "Arial", 30);
+		pP2Label->setAnchorPoint(Vec2(0, 1));
+		pP2Label->setPosition(Vec2(winSize.width / 2 + 20, winSize.height - 30));
+		pP2Label->setColor(Color3B::YELLOW);
+		this->addChild(pP2Label, Z_ORDER_BACKGROND);
+
+		auto pP2ScoreLabel = LabelTTF::create("0", "Arial", 30);
+		pP2ScoreLabel->setAnchorPoint(Vec2(0, 1));
+		pP2ScoreLabel->setPosition(Vec2(winSize.width / 2 + 20 + pP2Label->getContentSize().width, winSize.height - 30));
+		pP2ScoreLabel->setColor(Color3B::YELLOW);
+		pP2ScoreLabel->setTag(TAG_LABEL_P2SCORE);
+		this->addChild(pP2ScoreLabel, Z_ORDER_BACKGROND);
+	
+	}
 
 	pTarget = Sprite::create("ball_target.png");
 	pTarget->setPosition((winSize.width / 2.0f) - 46, winSize.height - 300);
@@ -307,7 +313,6 @@ void GameScene::initBackGround() {
 	pMenuBtn->setPosition(Vec2(winSize.width - 50, 100));
 	pMenuBtn->alignItemsVertically();
 	this->addChild(pMenuBtn, Z_ORDER_BACKGROND);
-
 
 	auto pBtnExit = MenuItemImage::create("CloseNormal.png", "CloseSelected.png", CC_CALLBACK_1(GameScene::doExitBtn, this));
 	auto pMenuExit = Menu::create(pBtnExit, nullptr);
@@ -376,11 +381,12 @@ void GameScene::turnStart() {
 		printScore(curTurn);
 	}
 	else {
-		if (bTest) {
+		if (bTest && (option % 10 == _MODE_DOUBLE_)) {
 			curTurn++;
 			curTurn %= 2;
 		}
 	}
+	myContactLstener->setThreeBallCushion(0);
 
 	playerBall[curTurn]->setTarget(true);
 
