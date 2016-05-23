@@ -34,17 +34,24 @@
 #define TAG_LABEL_P2SCORE	1
 #define TAG_SPRITE_TARGET_BALL	2
 #define TAG_LAYER_EXIT		3
+#define TAG_LAYER_SELECTMODE	4
 
 #include "cocos2d.h"
 #include "SimpleAudioEngine.h"
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-#define MUSIC_HIT	"hit.mp3"
-#define MUSIC_TURN	"drop.mp3"
-#else
-#define MUSIC_HIT	"hit.wav"
-#define MUSIC_TURN	"drop.wav"
-#endif
+/*#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#define MUSIC_HIT1	"hit1.mp3"
+#define MUSIC_HIT2	"hit2.mp3"
+#define MUSIC_HIT3	"hit3.mp3"
+#define MUSIC_SHOT	"shot.mp3"
+#define MUSIC_TURN	"turn.mp3"
+#else*/
+#define MUSIC_HIT1	"hit1.wav"
+#define MUSIC_HIT2	"hit2.wav"
+#define MUSIC_HIT3	"hit3.wav"
+#define MUSIC_SHOT	"shot.wav"
+#define MUSIC_TURN	"turn.wav"
+//#endif
 
 USING_NS_CC;
 

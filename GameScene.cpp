@@ -1,6 +1,8 @@
 ﻿#include "MenuScene.h"
 #include "GameScene.h"
 
+using namespace cocos2d::extension;
+
 Scene* GameScene::createScene()
 {
     auto scene = Scene::create();
@@ -39,29 +41,28 @@ bool GameScene::init()
 
 void GameScene::doExitBtn(Ref* obj) {
 
+	MenuItemFont::setFontSize(20);
+
 	auto backLayer = LayerColor::create(Color4B(0, 0, 0, 100), winSize.width, winSize.height);
 	backLayer->setAnchorPoint(Vec2(0, 0));
 	backLayer->setPosition(Vec2(0, 0));
 	backLayer->setTag(TAG_LAYER_EXIT);
 	this->addChild(backLayer, Z_ORDER_NEW_LAYER);
 
-	auto popLayer = CCLayerColor::create(Color4B(0, 255, 0, 255), 300, 200);
+	auto popLayer = Scale9Sprite::create("green_edit.png", Rect(0, 0 ,28, 28), Rect(9, 9, 9, 9));
+	popLayer->setContentSize(Size(300, 200));
 	popLayer->setAnchorPoint(Vec2(0, 0));
-	popLayer->setPosition(Vec2(
-		(winSize.width - popLayer->getContentSize().width) / 2,
-		(winSize.height - popLayer->getContentSize().height) / 2)
-		);
+	popLayer->setPosition(Vec2((winSize.width - popLayer->getContentSize().width) / 2,
+		(winSize.height - popLayer->getContentSize().height) / 2));
 	backLayer->addChild(popLayer);
 
 	auto pMenuItem1 = MenuItemFont::create(
 		"Ok", CC_CALLBACK_1(GameScene::doExit, this));
 	pMenuItem1->setColor(Color3B(0, 0, 0));
-	pMenuItem1->setTag(_MODE_3_BALL_);
 
 	auto pMenuItem2 = MenuItemFont::create(
 		"Cancel", CC_CALLBACK_1(GameScene::doCancel, this));
 	pMenuItem2->setColor(Color3B(0, 0, 0));
-	pMenuItem2->setTag(_MODE_4_BALL_);
 
 	auto pMenu = Menu::create(pMenuItem1, pMenuItem2, nullptr);
 	pMenu->alignItemsHorizontallyWithPadding(10.0f);
@@ -152,7 +153,7 @@ void GameScene::initBox2dWorld(b2Vec2 g) {
 }
 
 void GameScene::initBall() {
-	CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1.0f);
+	//CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1.0f);
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(MUSIC_TURN);
 
 	playerBall[PLAYER1] = new BilliardBall(Color3B::WHITE, PLAYER1);
@@ -220,7 +221,7 @@ b2Body* GameScene::createBall(Vec2 position, BilliardBall* pBilliardBall) {
 	fixtureDef.shape = &circle;
 	fixtureDef.density = BALL_DENSITY;
 	fixtureDef.friction = 0.1f;
-	fixtureDef.restitution = 0.8f;
+	fixtureDef.restitution = 0.85f;
 
 	ballBody->CreateFixture(&fixtureDef);
 	return ballBody;
@@ -243,8 +244,11 @@ GameScene::~GameScene() {
 }
 
 void GameScene::initSound() {
-	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect(MUSIC_HIT);
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect(MUSIC_HIT1);
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect(MUSIC_HIT2);
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect(MUSIC_HIT3);
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect(MUSIC_TURN);
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect(MUSIC_SHOT);
 }
 
 void GameScene::initBackGround() {
@@ -369,7 +373,7 @@ void GameScene::moveTagetBall(Vec2 oldPoint, Vec2 newPoint) {
 void GameScene::turnStart() {
 	bTurn = true;
 
-	CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1.0f);
+	//CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1.0f);
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(MUSIC_TURN);
 	playerBall[curTurn]->setTarget(false);
 
@@ -432,6 +436,8 @@ bool GameScene::onTouchBegan(Touch *touch, Event *event) {
 	if (bTurn) {
 		if (pCueBox->getBoundingBox().containsPoint(touchPoint)) {
 			bSelect = false;
+			power = pCuePower->getContentSize().height / 2.0f;
+			pCuePower->setPositionY(pCueBox->getContentSize().height / 2.0f - power);
 		}
 		else {
 			bSelect = true;
@@ -467,9 +473,9 @@ void GameScene::onTouchMoved(Touch *touch, Event *event) {
 				pArrow->setRotation(gRotation);
 			}
 			else {
-				power += (oldPoint.y - newPoint.y);
-				if (power > pCueBox->getContentSize().height)
-					power = pCueBox->getContentSize().height;
+				power += (2*(oldPoint.y - newPoint.y));
+				if (power > pCuePower->getContentSize().height)
+					power = pCuePower->getContentSize().height;
 				if (power < 0)
 					power = 0;
 				pCuePower->setPositionY(pCueBox->getContentSize().height / 2.0f - power);
@@ -504,7 +510,7 @@ void GameScene::onTouchEnded(Touch *touch, Event *event) {
 					targetPosition = pTargetBall->getPosition() - Vec2(pTarget->getContentSize().width / 2.0, pTarget->getContentSize().height / 2.0f);
 					targetPosition = targetPosition / (pTarget->getContentSize().width / 2.0);
 					playerBall[curTurn]->initAngularVelocity(targetPosition);
-
+					CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(MUSIC_SHOT);
 					//턴종료
 					turnEnd();
 				}

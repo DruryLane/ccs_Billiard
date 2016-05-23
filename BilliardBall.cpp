@@ -130,6 +130,10 @@ void BilliardBall::setAngularVelocity(Vec3 m_angularVelocity) {
 	angularVelocity = m_angularVelocity;
 }
 
+void BilliardBall::setLinearA(b2Vec2 vec2) {
+	linearA = vec2;
+}
+;
 b2Vec2 BilliardBall::angularToLinear(Vec3 m_angularVelocity) {
 	b2Vec2 m_velocity;
 	Vec3 r = Vec3(0, 0, -CIRCLE_RADIUS);

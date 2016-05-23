@@ -70,15 +70,32 @@ void ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impu
 			contactBall[ballA->getBallNum()] = true;
 		}
 		
-		CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(impulse->normalImpulses[0] * MUSIC_HIT_VOLUME);
-		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(MUSIC_HIT);
-		log("%f", impulse->normalImpulses[0]);
-	}
-	else {
-		if ((contactBall[PLAYER1]&&contactBall[OTHER1]) || (contactBall[PLAYER2] && contactBall[OTHER1])) {
+		if (impulse->normalImpulses[0] > 6) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(MUSIC_HIT1);
+		}
+		else if (impulse->normalImpulses[0] > 2.5) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(MUSIC_HIT2);
 		}
 		else {
-			threeBallCushion++;
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(MUSIC_HIT3);
+		}
+	}
+	else {
+
+		BilliardBall* ball;
+		if (bodyA->GetType() == b2_dynamicBody) {
+			ball = (BilliardBall*)bodyA->GetUserData();
+		}
+		else {
+			ball = (BilliardBall*)bodyB->GetUserData();
+		}
+
+		if (ball->isTarget()) {
+			if ((contactBall[PLAYER1] && contactBall[OTHER1]) || (contactBall[PLAYER2] && contactBall[OTHER1])) {
+			}
+			else {
+				threeBallCushion++;
+			}
 		}
 	}
 }

@@ -33,6 +33,7 @@ public:
 	void setTarget(bool t);
 	void setBallNum(int num);
 	void setAngularVelocity(Vec3 m_angularVelocity);
+	void setLinearA(b2Vec2 vec2);
 
 	b2Vec2 angularToLinear(Vec3 m_angularVelocity);
 
