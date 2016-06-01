@@ -63,6 +63,12 @@ void ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impu
 	if (bodyA->GetType() == b2_dynamicBody && bodyB->GetType() == b2_dynamicBody){
 		BilliardBall* ballA = (BilliardBall*)bodyA->GetUserData();
 		BilliardBall* ballB = (BilliardBall*)bodyB->GetUserData();
+
+		//ballA->setLinearA(b2Vec2_zero);
+		//ballB->setLinearA(b2Vec2_zero);
+		ballA->afterImpulse(impulse->normalImpulses[0]);
+		ballB->afterImpulse(impulse->normalImpulses[0]);
+
 		if (ballA->isTarget()) {
 			contactBall[ballB->getBallNum()] = true;
 		}

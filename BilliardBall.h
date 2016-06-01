@@ -3,7 +3,7 @@
 
 #define FRICTION_SLIDE		2.0f	//운동저항
 #define FRICTION_ROLLING	12.0f	//회전저항
-#define ANGULAR_POWER		0.005f
+#define ANGULAR_POWER		0.01f
 
 #include "GameManager.h"
 #include "Box2D/Box2D.h"
@@ -36,6 +36,7 @@ public:
 	void setLinearA(b2Vec2 vec2);
 
 	b2Vec2 angularToLinear(Vec3 m_angularVelocity);
+	void afterImpulse(float impulse);
 
 private:
 	Sprite* pSprite;

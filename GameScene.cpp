@@ -41,8 +41,6 @@ bool GameScene::init()
 
 void GameScene::doExitBtn(Ref* obj) {
 
-	MenuItemFont::setFontSize(20);
-
 	auto backLayer = LayerColor::create(Color4B(0, 0, 0, 100), winSize.width, winSize.height);
 	backLayer->setAnchorPoint(Vec2(0, 0));
 	backLayer->setPosition(Vec2(0, 0));
@@ -56,17 +54,20 @@ void GameScene::doExitBtn(Ref* obj) {
 		(winSize.height - popLayer->getContentSize().height) / 2));
 	backLayer->addChild(popLayer);
 
-	auto pMenuItem1 = MenuItemFont::create(
-		"Ok", CC_CALLBACK_1(GameScene::doExit, this));
-	pMenuItem1->setColor(Color3B(0, 0, 0));
+	auto pLabel1 = LabelTTF::create("정말로 게임을 종료하시겠습니까?", "Arial", 30, Size(260, 200),
+		TextHAlignment::CENTER, TextVAlignment::CENTER);
+	pLabel1->setPosition(Vec2(popLayer->getContentSize().width / 2, popLayer->getContentSize().height - 70));
+	popLayer->addChild(pLabel1);
 
-	auto pMenuItem2 = MenuItemFont::create(
-		"Cancel", CC_CALLBACK_1(GameScene::doCancel, this));
-	pMenuItem2->setColor(Color3B(0, 0, 0));
+	auto pMenuItem1 = MenuItemImage::create(
+		"OK01.png", "OK02.png", CC_CALLBACK_1(GameScene::doExit, this));
+
+	auto pMenuItem2 = MenuItemImage::create(
+		"cancel01.png", "cancel02.png", CC_CALLBACK_1(GameScene::doCancel, this));
 
 	auto pMenu = Menu::create(pMenuItem1, pMenuItem2, nullptr);
 	pMenu->alignItemsHorizontallyWithPadding(10.0f);
-	pMenu->setPosition(Vec2(150, 100));
+	pMenu->setPosition(Vec2(150, 50));
 	popLayer->addChild(pMenu);
 }
 
@@ -153,23 +154,25 @@ void GameScene::initBox2dWorld(b2Vec2 g) {
 }
 
 void GameScene::initBall() {
-	//CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1.0f);
-	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(MUSIC_TURN);
 
 	playerBall[PLAYER1] = new BilliardBall(Color3B::WHITE, PLAYER1);
-	playerBall[PLAYER1]->setBody(createBall(Vec2(230, 450), playerBall[PLAYER1]));
-	playerBall[PLAYER1]->setTarget(true);
-
 	playerBall[PLAYER2] = new BilliardBall(Color3B::YELLOW, PLAYER2);
-	playerBall[PLAYER2]->setBody(createBall(Vec2(130, 200), playerBall[PLAYER2]));	
-
 	otherBall1 = new BilliardBall(Color3B::RED, OTHER1);
-	otherBall1->setBody(createBall(Vec2(210, 550), otherBall1));
+	otherBall2 = new BilliardBall(Color3B::RED, OTHER2);
 	
 	if (option / 10 == _MODE_4_BALL_) {
-		otherBall2 = new BilliardBall(Color3B::RED, OTHER2);
-		otherBall2->setBody(createBall(Vec2(250, 550), otherBall2));
+		playerBall[PLAYER1]->setBody(createBall(Vec2(289.598022, 261.212128), playerBall[PLAYER1]));
+		playerBall[PLAYER2]->setBody(createBall(Vec2(244.871597, 753.204651), playerBall[PLAYER2]));
+		otherBall1->setBody(createBall(Vec2(244.871597, 261.212128), otherBall1));
+		otherBall2->setBody(createBall(Vec2(244.871597, 655.764282), otherBall2));
 	}
+	else {
+		playerBall[PLAYER1]->setBody(createBall(Vec2(289.598022, 261.212128), playerBall[PLAYER1]));
+		playerBall[PLAYER2]->setBody(createBall(Vec2(244.871597, 655.764282), playerBall[PLAYER2]));
+		otherBall1->setBody(createBall(Vec2(244.871597, 261.212128), otherBall1));
+	}
+
+	playerBall[PLAYER1]->setTarget(true);
 }
 
 void GameScene::testBtn(Ref* sender) {
@@ -188,8 +191,8 @@ void GameScene::testBtn(Ref* sender) {
 		_world->DestroyBody(playerBall[PLAYER1]->getBody());
 		_world->DestroyBody(otherBall1->getBody());
 
-		playerBall[PLAYER1]->initSprite(Color3B::RED);
-		otherBall1->initSprite(Color3B::WHITE);
+		playerBall[PLAYER1]->initSprite(Color3B::WHITE);
+		otherBall1->initSprite(Color3B::RED);
 
 		playerBall[PLAYER1]->setBody(createBall(Vec2(150, 200), playerBall[PLAYER1]));
 		otherBall1->setBody(createBall(Vec2(200, 270), otherBall1));
@@ -249,6 +252,8 @@ void GameScene::initSound() {
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect(MUSIC_HIT3);
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect(MUSIC_TURN);
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect(MUSIC_SHOT);
+
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(MUSIC_TURN);
 }
 
 void GameScene::initBackGround() {
@@ -433,6 +438,8 @@ void GameScene::onEnter() {
 
 bool GameScene::onTouchBegan(Touch *touch, Event *event) {
 	auto touchPoint = touch->getLocation();
+
+	log("%f %f", touchPoint.x, touchPoint.y);
 	if (bTurn) {
 		if (pCueBox->getBoundingBox().containsPoint(touchPoint)) {
 			bSelect = false;

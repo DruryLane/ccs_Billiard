@@ -39,19 +39,19 @@
 #include "cocos2d.h"
 #include "SimpleAudioEngine.h"
 
-/*#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-#define MUSIC_HIT1	"hit1.mp3"
-#define MUSIC_HIT2	"hit2.mp3"
-#define MUSIC_HIT3	"hit3.mp3"
-#define MUSIC_SHOT	"shot.mp3"
-#define MUSIC_TURN	"turn.mp3"
-#else*/
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#define MUSIC_HIT1	"hit1.ogg"
+#define MUSIC_HIT2	"hit2.ogg"
+#define MUSIC_HIT3	"hit3.ogg"
+#define MUSIC_SHOT	"shot.ogg"
+#define MUSIC_TURN	"turn.ogg"
+#else
 #define MUSIC_HIT1	"hit1.wav"
 #define MUSIC_HIT2	"hit2.wav"
 #define MUSIC_HIT3	"hit3.wav"
 #define MUSIC_SHOT	"shot.wav"
 #define MUSIC_TURN	"turn.wav"
-//#endif
+#endif
 
 USING_NS_CC;
 

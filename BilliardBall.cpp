@@ -143,3 +143,23 @@ b2Vec2 BilliardBall::angularToLinear(Vec3 m_angularVelocity) {
 
 	return m_velocity;
 }
+
+void BilliardBall::afterImpulse(float impulse) {
+	setLinearA(b2Vec2_zero);
+	angularVelocity.z = pBody->GetAngularVelocity();
+
+	//구름 마찰력으로 인한 회전력 변화
+	Vec2 dw = Vec2(angularVelocity.x, angularVelocity.y);
+	dw.normalize();
+	dw = -1.5 * impulse * dw;
+
+	if (Vec2(angularVelocity.x, angularVelocity.y).length() > dw.length()) {
+		angularVelocity.x += dw.x;
+		angularVelocity.y += dw.y;
+	}
+	else {
+		dw = Vec2(angularVelocity.x, angularVelocity.y);
+		angularVelocity.x = 0.0f;
+		angularVelocity.y = 0.0f;
+	}
+}
